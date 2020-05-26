@@ -1,0 +1,42 @@
+{
+  "name": "vue-rpg-dice-roller",
+  "version": "0.1.0",
+  "description": "Plugin for VuePress that allows rolling dice",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build --target lib src/DiceRoller.vue",
+    "lint": "vue-cli-service lint",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GreenImp/vue-rpg-dice-roller.git"
+  },
+  "keywords": [
+    "dice",
+    "roll",
+    "vue"
+  ],
+  "author": "GreenImp <info@greenimp.co.uk> (http://greenimp.co.uk)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GreenImp/vue-rpg-dice-roller/issues"
+  },
+  "homepage": "https://github.com/GreenImp/vue-rpg-dice-roller#readme",
+  "dependencies": {
+    "rpg-dice-roller": "^4.1.0",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.3.0",
+    "@vue/cli-plugin-eslint": "~4.3.0",
+    "@vue/cli-service": "~4.3.0",
+    "@vue/eslint-config-airbnb": "^5.0.2",
+    "babel-eslint": "^10.1.0",
+    "core-js": "^3.6.5",
+    "eslint": "^6.7.2",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "vue-template-compiler": "^2.6.11"
+  }
+}
