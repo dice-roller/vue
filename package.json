@@ -1,7 +1,13 @@
 {
   "name": "vue-rpg-dice-roller",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Plugin for VuePress that allows rolling dice",
+  "main": "dist/vue-rpg-dice-roller.umd.js",
+  "module": "src/vue-rpg-dice-roller.vueUpdate",
+  "unpkg": "dist/vue-rpg-dice-roller.umd.min.js",
+  "browser": {
+    "./sfc": "src/vue-rpg-dice-roller.vue"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib src/DiceRoller.vue",
