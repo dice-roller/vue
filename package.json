@@ -1,6 +1,6 @@
 {
   "name": "vue-rpg-dice-roller",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Plugin for VuePress that allows rolling dice",
   "main": "dist/vue-rpg-dice-roller.umd.js",
   "module": "src/DiceRoller.vue",
@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/GreenImp/vue-rpg-dice-roller#readme",
   "dependencies": {
-    "rpg-dice-roller": "^4.3.0",
+    "rpg-dice-roller": "^4.3.1",
     "vue": "^2.6.11"
   },
   "devDependencies": {
