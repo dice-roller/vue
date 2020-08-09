@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/GreenImp/vue-rpg-dice-roller#readme",
   "dependencies": {
-    "rpg-dice-roller": "^4.3.1",
+    "rpg-dice-roller": "^4.4.0",
     "vue": "^2.6.11"
   },
   "devDependencies": {
