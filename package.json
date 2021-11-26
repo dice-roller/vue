@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/dice-roller/vue",
   "dependencies": {
-    "rpg-dice-roller": "^4.5.0",
+    "rpg-dice-roller": "^5.0.0",
     "vue": "^2.6.12"
   },
   "devDependencies": {
