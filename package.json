@@ -1,10 +1,10 @@
 {
-  "name": "vue-rpg-dice-roller",
+  "name": "@dice-roller/vue",
   "version": "0.1.7",
-  "description": "Plugin for VuePress that allows rolling dice",
-  "main": "dist/vue-rpg-dice-roller.umd.js",
+  "description": "Vue.js component which allows rolling dice",
+  "main": "dist/vue.umd.js",
   "module": "src/DiceRoller.vue",
-  "unpkg": "dist/vue-rpg-dice-roller.umd.min.js",
+  "unpkg": "dist/vue.umd.min.js",
   "browser": {
     "./sfc": "src/DiceRoller.vue"
   },
@@ -16,19 +16,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GreenImp/vue-rpg-dice-roller.git"
+    "url": "git+https://github.com/dice-roller/vue.git"
   },
   "keywords": [
     "dice",
     "roll",
     "vue"
   ],
-  "author": "GreenImp <info@greenimp.co.uk> (http://greenimp.co.uk)",
+  "author": "GreenImp Media <info@greenimp.co.uk> (http://greenimp.co.uk)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/GreenImp/vue-rpg-dice-roller/issues"
+    "url": "https://github.com/dice-roller/vue/issues"
   },
-  "homepage": "https://github.com/GreenImp/vue-rpg-dice-roller#readme",
+  "homepage": "https://github.com/dice-roller/vue",
   "dependencies": {
     "rpg-dice-roller": "^4.5.0",
     "vue": "^2.6.12"
