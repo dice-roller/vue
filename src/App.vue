@@ -1,5 +1,6 @@
 <script setup>
 import DiceRoller from './components/DiceRoller.vue'
+import DiceRollerTailwind from './components/DiceRollerTailwind.vue'
 </script>
 
 <template>
@@ -13,7 +14,17 @@ import DiceRoller from './components/DiceRoller.vue'
   </header>
 
   <main>
-    <DiceRoller />
+    <div class="rollers">
+      <section>
+        <h2>Basic</h2>
+        <DiceRoller />
+      </section>
+
+      <section>
+        <h2>Tailwind</h2>
+        <DiceRollerTailwind />
+      </section>
+    </div>
   </main>
 </template>
 
@@ -22,6 +33,11 @@ h1 {
   font-weight: 500;
   font-size: 2.6rem;
   top: -10px;
+}
+
+h2 {
+  color: #6a8bad;
+  font-size: 2rem;
 }
 
 h3 {
@@ -40,6 +56,12 @@ header .wrapper {
 .logo {
   display: block;
   margin: 0 auto 2rem;
+}
+
+.rollers {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
 }
 
 @media (min-width: 1024px) {
