@@ -8,30 +8,30 @@ Vue.js component which allows rolling dice.
 
 It is built upon this [RPG dice roller](https://github.com/dice-roller/rpg-dice-roller), and is used in the [documentation](https://dice-roller.github.io/documentation/).
 
-## Project setup
+## Customize configuration
+
+See [Vite Configuration Reference](https://vitejs.dev/config/).
+
+## Project Setup
 
 ```sh
 npm install @dice-roller/vue
 ```
 
-### Compiles and hot-reloads for development
+### Compile and Hot-Reload for Development
 
 ```sh
-npm run serve
+npm run dev
 ```
 
-### Compiles and minifies for production
+### Compile and Minify for Production
 
 ```sh
 npm run build
 ```
 
-### Lints and fixes files
+### Lint with [ESLint](https://eslint.org/)
 
 ```sh
 npm run lint
 ```
-
-### Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).
