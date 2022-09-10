@@ -2,9 +2,13 @@
 import { computed, ref } from 'vue';
 import { DiceRoll } from '@dice-roller/rpg-dice-roller';
 
-const emit = defineEmits(['roll'])
+const emit = defineEmits(['roll']);
 
 const props = defineProps({
+  buttonLabel: {
+    type: String,
+    default: 'Roll',
+  },
   id: String,
   notation: String,
 });
@@ -41,74 +45,30 @@ const roll = () => {
 
 <template>
   <section :id="id" class="dice-roller">
-    <transition name="fade">
-      <output v-if="output" name="output" :for="inputId" class="output">
-        {{ output }}
-      </output>
-    </transition>
+    <output v-if="output" name="output" :for="inputId" class="dice-roller-output">
+      {{ output }}
+    </output>
 
-    <input
-      type="text"
-      name="notation"
-      :id="inputId"
-      :placeholder="`e.g. ${notation || '4d6'}`"
-      v-model="currentNotation"
-      :class="error ? 'is-invalid' : ''"
-      @change="$emit('notation:change', $event.target.value)"
-      @keyup.enter="roll"
-    />
-
-    <transition name="fade">
-      <span class="invalid-feedback" v-if="error">{{ error }}</span>
-    </transition>
-
-    <footer>
+    <div>
       <label :for="inputId">
-        Enter the notation and press "enter" to roll the dice!
+        Notation
       </label>
-    </footer>
+
+      <input
+          type="text"
+          name="notation"
+          :id="inputId"
+          :placeholder="`e.g. ${notation || '4d6'}`"
+          v-model="currentNotation"
+          @change="$emit('notation:change', $event.target.value)"
+          @keyup.enter="roll"
+      />
+
+      <button type="button" @click="roll">
+        <slot name="button">{{ buttonLabel }}</slot>
+      </button>
+    </div>
+
+    <span v-if="error">{{ error }}</span>
   </section>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity .5s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
-input:invalid,
-input.is-invalid {
-  color: #ff0000;
-}
-
-.invalid-feedback {
-  display: block;
-  margin: .5rem 0 0;
-  color: #ff0000;
-  font-size: .8rem;
-}
-
-.dice-roller {
-  margin: 1rem 0;
-  padding: 1rem 1.5rem;
-  border-radius: .4rem;
-  background-color: #f0f4f8;
-}
-
-.output {
-  display: block;
-  margin: 0 0 1rem;
-  padding: .5rem 1.9rem;
-  font-size: 1.5rem;
-  border-radius: .4rem;
-  background: #fff;
-}
-
-footer {
-  font-size: .8rem;
-}
-</style>
