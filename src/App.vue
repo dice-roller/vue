@@ -1,6 +1,7 @@
 <script setup>
 import DiceRoller from './components/DiceRoller.vue'
-import DiceRollerTailwind from './components/DiceRollerTailwind.vue'
+//import DiceRollerTailwind from './components/DiceRollerTailwind.vue'
+import DiceRollerBootstrap from './components/DiceRollerBootstrap.vue'
 </script>
 
 <template>
@@ -20,9 +21,14 @@ import DiceRollerTailwind from './components/DiceRollerTailwind.vue'
         <DiceRoller />
       </section>
 
-      <section>
+<!--      <section>
         <h2>Tailwind</h2>
         <DiceRollerTailwind />
+      </section>-->
+
+      <section>
+        <h2>Bootstrap</h2>
+        <DiceRollerBootstrap />
       </section>
     </div>
   </main>
