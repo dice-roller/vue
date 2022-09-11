@@ -1,5 +1,8 @@
 <script setup>
 import DiceRoller from './components/DiceRoller.vue'
+import DiceRollerTailwind from './components/DiceRollerTailwind.vue'
+import DiceRollerBootstrap from './components/DiceRollerBootstrap.vue'
+import DiceRollerRenderless from './components/DiceRollerRenderless.vue';
 </script>
 
 <template>
@@ -13,7 +16,45 @@ import DiceRoller from './components/DiceRoller.vue'
   </header>
 
   <main>
-    <DiceRoller />
+    <div class="rollers">
+      <section>
+        <h2>Renderless</h2>
+
+        <DiceRollerRenderless notation="10d2" v-slot="{ currentNotation, error, output, roll, on, bind }">
+          <div class="p-4 rounded bg-slate-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200">
+            <div v-if="error">{{ error }}</div>
+
+            <input class="block w-full text-base h-11 px-4 text-black" type="text" v-on="on" v-bind="bind" />
+
+            <button type="button" class="block w-full bg-red-300 dark:bg-gray-800 px-4 py-2 my-4" @click="roll">Roll</button>
+
+            <div class="block mb-8">
+              <strong>Notation:</strong> <em>{{ currentNotation }}</em>
+            </div>
+
+            <output v-if="output" class="block p-4 bg-teal-100 dark:bg-yellow-100 text-gray-600 font-bold font-mono">{{ output }}</output>
+          </div>
+        </DiceRollerRenderless>
+      </section>
+
+      <section>
+        <h2>Un-styled</h2>
+
+        <DiceRoller />
+      </section>
+
+      <section>
+        <h2>Tailwind</h2>
+
+        <DiceRollerTailwind />
+      </section>
+
+      <section>
+        <h2>Bootstrap</h2>
+
+        <DiceRollerBootstrap />
+      </section>
+    </div>
   </main>
 </template>
 
@@ -22,6 +63,11 @@ h1 {
   font-weight: 500;
   font-size: 2.6rem;
   top: -10px;
+}
+
+h2 {
+  color: #6a8bad;
+  font-size: 2rem;
 }
 
 h3 {
@@ -40,6 +86,12 @@ header .wrapper {
 .logo {
   display: block;
   margin: 0 auto 2rem;
+}
+
+.rollers {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
 }
 
 @media (min-width: 1024px) {
