@@ -1,8 +1,8 @@
 <script setup>
-import { computed, ref } from 'vue';
-import { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import DiceRollerRenderless from './DiceRollerRenderless.vue';
+import { useIdGenerator } from '../composables/idGenerator.js';
 
-const emit = defineEmits(['roll']);
+defineEmits(['notation:change', 'roll']);
 
 const props = defineProps({
   buttonLabel: {
@@ -13,62 +13,43 @@ const props = defineProps({
   notation: String,
 });
 
-const currentNotation = ref(`${props.notation || ''}`);
-const error = ref(null);
-const output = ref(null);
-
-const inputId = computed(() => {
-  const prefix = `${props.id || 'dice-roller'}-`;
-  const id = `${Date.now().toString(32)}-${Math.random().toString(36).substring(2)}`;
-
-  return `${prefix}${id}`;
-});
-
-const roll = () => {
-  error.value = null;
-
-  try {
-    output.value = currentNotation.value ? new DiceRoll(currentNotation.value) : null;
-  } catch (e) {
-    output.value = null;
-
-    if (e.name === 'SyntaxError') {
-      error.value = `Invalid notation; ${e.message}`;
-    } else {
-      error.value = `An error has occurred: ${e.message}`;
-    }
-  } finally {
-    emit('roll', currentNotation);
-  }
-};
+const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
 </script>
 
 <template>
-  <section :id="id" class="dice-roller">
-    <output v-if="output" name="output" :for="inputId" class="dice-roller-output">
-      {{ output }}
-    </output>
+  <DiceRollerRenderless
+      :notation="notation"
+      v-slot="{ error, output, roll, on, bind }"
+      @notation:change="$emit('notation:change', $event)"
+      @roll="$emit('roll', $event)"
+  >
+    <section :id="id" class="dice-roller">
+      <output v-if="output" name="output" :for="inputId" class="dice-roller-output">
+        {{ output }}
+      </output>
 
-    <div>
-      <label :for="inputId">
-        Notation
-      </label>
+      <div class="dice-roller-input-group">
+        <label :for="inputId" class="dice-roller-label">
+          Notation
+        </label>
 
-      <input
-          type="text"
-          name="notation"
-          :id="inputId"
-          :placeholder="`e.g. ${notation || '4d6'}`"
-          v-model="currentNotation"
-          @change="$emit('notation:change', $event.target.value)"
-          @keyup.enter="roll"
-      />
+        <input
+            type="text"
+            name="notation"
+            :id="inputId"
+            :placeholder="`e.g. ${notation || '4d6'}`"
+            class="dice-roller-input"
+            :class="error ? 'dice-roller-input-invalid' : ''"
+            v-on="on"
+            v-bind="bind"
+        />
 
-      <button type="button" @click="roll">
-        <slot name="button">{{ buttonLabel }}</slot>
-      </button>
-    </div>
+        <button type="button" class="dice-roller-button" @click="roll">
+          <slot name="button">{{ buttonLabel }}</slot>
+        </button>
+      </div>
 
-    <span v-if="error">{{ error }}</span>
-  </section>
+      <span v-if="error" class="dice-roller-error">{{ error }}</span>
+    </section>
+  </DiceRollerRenderless>
 </template>
