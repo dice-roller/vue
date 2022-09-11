@@ -24,17 +24,10 @@ import { useIdGenerator } from '../composables/idGenerator.js';
 defineEmits(['notation:change', 'roll']);
 
 const props = defineProps({
-  buttonLabel: {
+  bgVariant: {
     type: String,
-    default: 'Roll',
-  },
-  id: String,
-  notation: String,
-  btnVariant: {
-    type: String,
-    default: 'primary',
     validator(value) {
-      return btnVariants.includes(value);
+      return bgVariants.includes(value);
     },
   },
   borderVariant: {
@@ -43,34 +36,29 @@ const props = defineProps({
       return borderVariants.includes(value);
     },
   },
-  bgVariant: {
+  btnLabel: {
+    type: String,
+    default: 'Roll',
+  },
+  btnVariant: {
+    type: String,
+    default: 'primary',
+    validator(value) {
+      return btnVariants.includes(value);
+    },
+  },
+  id: String,
+  notation: String,
+  outputBgVariant: {
     type: String,
     validator(value) {
       return bgVariants.includes(value);
-    },
-  },
-  textVariant: {
-    type: String,
-    validator(value) {
-      return textVariants.includes(value);
-    },
-  },
-  variant: {
-    type: String,
-    validator(value) {
-      return variants.includes(value);
     },
   },
   outputBorderVariant: {
     type: String,
     validator(value) {
       return borderVariants.includes(value);
-    },
-  },
-  outputBgVariant: {
-    type: String,
-    validator(value) {
-      return bgVariants.includes(value);
     },
   },
   outputTextVariant: {
@@ -80,6 +68,18 @@ const props = defineProps({
     },
   },
   outputVariant: {
+    type: String,
+    validator(value) {
+      return variants.includes(value);
+    },
+  },
+  textVariant: {
+    type: String,
+    validator(value) {
+      return textVariants.includes(value);
+    },
+  },
+  variant: {
     type: String,
     validator(value) {
       return variants.includes(value);
@@ -153,7 +153,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
               :class="buttonClass"
               @click="roll"
           >
-            <slot name="button">{{ buttonLabel }}</slot>
+            <slot name="button">{{ btnLabel }}</slot>
           </button>
         </div>
 

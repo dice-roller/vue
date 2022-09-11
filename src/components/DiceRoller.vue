@@ -5,7 +5,7 @@ import { useIdGenerator } from '../composables/idGenerator.js';
 defineEmits(['notation:change', 'roll']);
 
 const props = defineProps({
-  buttonLabel: {
+  btnLabel: {
     type: String,
     default: 'Roll',
   },
@@ -48,7 +48,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
         />
 
         <button type="button" :class="`${className}-button`" @click="roll">
-          <slot name="button">{{ buttonLabel }}</slot>
+          <slot name="button">{{ btnLabel }}</slot>
         </button>
       </div>
 
