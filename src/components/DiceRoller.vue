@@ -9,6 +9,10 @@ const props = defineProps({
     type: String,
     default: 'Roll',
   },
+  className: {
+    type: String,
+    default: 'dice-roller'
+  },
   id: String,
   notation: String,
 });
@@ -23,13 +27,13 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
       @notation:change="$emit('notation:change', $event)"
       @roll="$emit('roll', $event)"
   >
-    <section :id="id" class="dice-roller">
-      <output v-if="output" name="output" :for="inputId" class="dice-roller-output">
+    <section :id="id" :class="className">
+      <output v-if="output" name="output" :for="inputId" :class="`${className}-output`">
         {{ output }}
       </output>
 
-      <div class="dice-roller-input-group">
-        <label :for="inputId" class="dice-roller-label">
+      <div :class="`${className}-input-group`">
+        <label :for="inputId" :class="`${className}-label`">
           Notation
         </label>
 
@@ -38,18 +42,17 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
             name="notation"
             :id="inputId"
             :placeholder="`e.g. ${notation || '4d6'}`"
-            class="dice-roller-input"
-            :class="error ? 'dice-roller-input-invalid' : ''"
+            :class="[`${className}-input`, error ? `${className}-input-invalid` : null]"
             v-on="on"
             v-bind="bind"
         />
 
-        <button type="button" class="dice-roller-button" @click="roll">
+        <button type="button" :class="`${className}-button`" @click="roll">
           <slot name="button">{{ buttonLabel }}</slot>
         </button>
       </div>
 
-      <span v-if="error" class="dice-roller-error">{{ error }}</span>
+      <span v-if="error" :class="`${className}-error`">{{ error }}</span>
     </section>
   </DiceRollerRenderless>
 </template>

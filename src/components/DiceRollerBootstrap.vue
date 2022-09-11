@@ -1,4 +1,23 @@
+<script>
+const variants = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
+const bgVariants = [...variants, ...['body', 'white', 'transparent']];
+const textVariants = [...variants, ...['body', 'muted', 'white', 'black-50', 'white-50']];
+const btnVariants = [...variants, ...[
+  'link',
+  'outline-primary',
+  'outline-secondary',
+  'outline-success',
+  'outline-danger',
+  'outline-warning',
+  'outline-info',
+  'outline-light',
+  'outline-dark',
+]];
+const borderVariants = [...variants, ...['white']];
+</script>
+
 <script setup>
+import { computed } from 'vue';
 import DiceRollerRenderless from './DiceRollerRenderless.vue';
 import { useIdGenerator } from '../composables/idGenerator.js';
 
@@ -11,6 +30,83 @@ const props = defineProps({
   },
   id: String,
   notation: String,
+  btnVariant: {
+    type: String,
+    default: 'primary',
+    validator(value) {
+      return btnVariants.includes(value);
+    },
+  },
+  borderVariant: {
+    type: String,
+    validator(value) {
+      return borderVariants.includes(value);
+    },
+  },
+  bgVariant: {
+    type: String,
+    validator(value) {
+      return bgVariants.includes(value);
+    },
+  },
+  textVariant: {
+    type: String,
+    validator(value) {
+      return textVariants.includes(value);
+    },
+  },
+  variant: {
+    type: String,
+    validator(value) {
+      return variants.includes(value);
+    },
+  },
+  outputBorderVariant: {
+    type: String,
+    validator(value) {
+      return borderVariants.includes(value);
+    },
+  },
+  outputBgVariant: {
+    type: String,
+    validator(value) {
+      return bgVariants.includes(value);
+    },
+  },
+  outputTextVariant: {
+    type: String,
+    validator(value) {
+      return textVariants.includes(value);
+    },
+  },
+  outputVariant: {
+    type: String,
+    validator(value) {
+      return variants.includes(value);
+    },
+  },
+});
+
+const cardClass = computed(() => {
+    return {
+      [`text-bg-${props.variant}`]: props.variant,
+      [`bg-${props.bgVariant}`]: props.bgVariant,
+      [`text-${props.textVariant}`]: props.textVariant,
+      [`border-${props.borderVariant}`]: props.borderVariant,
+    };
+});
+
+const outputClass = computed(() => {
+  return {
+    [`text-bg-${props.outputVariant}`]: props.outputVariant,
+    [`bg-${props.outputBgVariant}`]: props.outputBgVariant,
+    [`text-${props.outputTextVariant}`]: props.outputTextVariant,
+    [`border-${props.outputBorderVariant}`]: props.outputBorderVariant,
+  }
+});
+
+const buttonClass = computed(() => {
+  return `btn-${props.btnVariant || 'primary'}`;
 });
 
 const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
@@ -23,13 +119,14 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
       @notation:change="$emit('notation:change', $event)"
       @roll="$emit('roll', $event)"
   >
-    <div :id="id" class="dice-roller card text-bg-light">
+    <div :id="id" class="dice-roller card" :class="cardClass">
       <div class="card-body">
         <output
             v-if="output"
             name="output"
             :for="inputId"
-            class="d-block mb-4 p-3 fs-4 rounded border text-dark bg-white border-[#d4f4c6]"
+            class="d-block mb-4 p-3 fs-4 rounded border"
+            :class="outputClass"
         >
           {{ output }}
         </output>
@@ -52,7 +149,8 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
 
           <button
               type="button"
-              class="btn btn-primary"
+              class="btn"
+              :class="buttonClass"
               @click="roll"
           >
             <slot name="button">{{ buttonLabel }}</slot>
