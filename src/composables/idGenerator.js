@@ -3,7 +3,7 @@ import { ref } from 'vue';
 const hasCrypto = () => typeof crypto !== 'undefined' && crypto && crypto.randomUUID;
 
 const getRandomId = () => {
-  if (hasCrypto){
+  if (hasCrypto()){
     return crypto.randomUUID();
   }
 
