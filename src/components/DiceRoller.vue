@@ -1,6 +1,7 @@
 <script setup>
 import DiceRollerRenderless from './DiceRollerRenderless.vue';
 import { useIdGenerator } from '../composables/idGenerator.js';
+import { ClipboardIcon } from '@heroicons/vue/24/outline';
 
 defineEmits(['notation:change', 'roll']);
 
@@ -42,17 +43,28 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
           :class="`${className}-copy-button`"
           @click="copy.copy()"
         >
-          <span v-if="copy.copied">
+          <ClipboardIcon :class="`${className}-copy-icon`" />
+
+          <span
+            v-if="copy.copied"
+            :class="`${className}-copy-label-success`"
+          >
             Copied!
           </span>
-          <span v-else>
+          <span
+            v-else
+            :class="`${className}-copy-label`"
+          >
             Copy
           </span>
         </button>
       </output>
 
       <div :class="`${className}-input-group`">
-        <label :for="inputId" :class="`${className}-label`">
+        <label
+          :for="inputId"
+          :class="`${className}-label`"
+        >
           Notation
         </label>
 

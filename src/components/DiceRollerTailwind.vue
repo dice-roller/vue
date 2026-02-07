@@ -52,6 +52,9 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
           >
             Copied!
           </span>
+          <span v-else class="sr-only">
+            Copy to clipboard
+          </span>
         </button>
       </output>
 
