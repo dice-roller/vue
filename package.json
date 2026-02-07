@@ -39,6 +39,8 @@
   "homepage": "https://github.com/dice-roller/vue",
   "dependencies": {
     "@dice-roller/rpg-dice-roller": "^5.5.0",
+    "@heroicons/vue": "^2.2.0",
+    "@vueuse/core": "^14.2.0",
     "vue": "^3.2.39"
   },
   "devDependencies": {
