@@ -52,16 +52,12 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
           >
             Copied!
           </span>
-          <span v-else class="sr-only">
-            Copy to clipboard
-          </span>
+          <span v-else class="sr-only"> Copy to clipboard </span>
         </button>
       </output>
 
       <div class="flex flex-col sm:flex-row gap-y-4">
-        <label :for="inputId" class="sr-only">
-          Notation
-        </label>
+        <label :for="inputId" class="sr-only"> Notation </label>
 
         <input
           type="text"
@@ -81,6 +77,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
         <button
           type="button"
           class="block px-8 h-11 font-bold text-gray-600 bg-gradient-to-br from-[#eda18b] to-[#d4f4c6] border border-l-0 border-gray-300 rounded transition dark:border-gray-700 focus:from-[#e88c71] focus:to-[#bbf0a3] focus:text-gray-800 focus:ring-[#d4f4c6] focus:border-[#d4f4c6] focus:outline-none hover:from-[#e88c71] hover:to-[#bbf0a3] hover:text-gray-800 sm:rounded-l-none"
+          :disabled="!bind.value"
           @click="roll"
         >
           <slot name="button">{{ btnLabel }}</slot>
