@@ -81,7 +81,12 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
           v-bind="bind"
         />
 
-        <button type="button" :class="`${className}-button`" @click="roll">
+        <button
+          type="button"
+          :class="`${className}-button`"
+          :disabled="!bind.value"
+          @click="roll"
+        >
           <slot name="button">{{ btnLabel }}</slot>
         </button>
       </div>

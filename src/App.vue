@@ -24,7 +24,11 @@ import DiceRollerRenderless from './components/DiceRollerRenderless.vue';
   <main>
     <div class="rollers">
       <section>
-        <h2>Renderless</h2>
+        <h2>Render-less</h2>
+
+        <p class="mb-2">
+          Example of using the render-less component with Tailwind.
+        </p>
 
         <DiceRollerRenderless
           notation="10d2"
@@ -45,6 +49,7 @@ import DiceRollerRenderless from './components/DiceRollerRenderless.vue';
             <button
               type="button"
               class="block w-full bg-red-300 dark:bg-gray-800 px-4 py-2 my-4"
+              :disabled="!bind.value"
               @click="roll"
             >
               Roll
@@ -77,17 +82,23 @@ import DiceRollerRenderless from './components/DiceRollerRenderless.vue';
       <section>
         <h2>Un-styled</h2>
 
+        <p class="mb-2">Raw unstyled component.</p>
+
         <DiceRoller />
       </section>
 
       <section>
         <h2>Tailwind</h2>
 
+        <p class="mb-2">Pre-styled component with Tailwind 3.</p>
+
         <DiceRollerTailwind />
       </section>
 
       <section>
         <h2>Bootstrap</h2>
+
+        <p class="mb-2">Pre-styled component with Bootstrap 5.</p>
 
         <DiceRollerBootstrap />
       </section>
@@ -129,6 +140,11 @@ header .wrapper {
   display: flex;
   flex-direction: column;
   row-gap: 1rem;
+}
+
+.rollers > :not(:last-child) {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #ccc;
 }
 
 @media (min-width: 1024px) {

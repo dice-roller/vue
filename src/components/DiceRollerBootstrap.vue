@@ -151,6 +151,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
               type="button"
               class="btn"
               :class="buttonClass"
+              :disabled="!bind.value"
               @click="roll"
           >
             <slot name="button">{{ btnLabel }}</slot>
