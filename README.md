@@ -16,6 +16,17 @@ It is built upon this [RPG dice roller](https://github.com/dice-roller/rpg-dice-
 npm install @dice-roller/vue
 ```
 
+### Package builds and dependency sharing
+
+The package provides ESM and CommonJS builds through the same public imports. Import only the components or composable you need; ESM bundlers can remove unused components and icons:
+
+```js
+import { useDiceRoller } from '@dice-roller/vue';
+// Or: import { DiceRollerTailwind } from '@dice-roller/vue';
+```
+
+For direct browser script usage, `dist/vue.umd.cjs` expects the globals `Vue` and `rpgDiceRoller`. Load Vue and the dice roller library's UMD build (including its own required dependencies) before this file. Its exported global remains `DiceRollerVue`.
+
 ### Components
 
 ### Shared behaviour

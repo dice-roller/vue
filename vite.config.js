@@ -13,10 +13,11 @@ export default defineConfig({
       fileName: 'vue',
     },
     rolldownOptions: {
-      external: ['vue'],
+      external: ['vue', '@dice-roller/rpg-dice-roller'],
       output: {
         globals: {
           vue: 'Vue',
+          '@dice-roller/rpg-dice-roller': 'rpgDiceRoller',
         },
       },
     },
