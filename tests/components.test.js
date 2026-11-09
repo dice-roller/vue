@@ -116,7 +116,7 @@ for (const name of components) {
             bubbles: true,
             cancelable: true,
             ...options,
-          })
+          }),
         );
       }
       assert.equal(f.events.rolls.length, 0);
@@ -130,7 +130,7 @@ for (const name of components) {
       assert.ok(enter.defaultPrevented);
       assert.equal(f.events.rolls.length, 1);
       input.dispatchEvent(
-        new window.KeyboardEvent('keyup', { key: 'Enter', bubbles: true })
+        new window.KeyboardEvent('keyup', { key: 'Enter', bubbles: true }),
       );
       assert.equal(f.events.rolls.length, 1);
       assert.equal(f.submits(), 0);
@@ -160,7 +160,7 @@ for (const name of components) {
       assert.equal(input.getAttribute('aria-invalid'), 'true');
       assert.equal(
         input.getAttribute('aria-describedby'),
-        `consumer-help ${error.id}`
+        `consumer-help ${error.id}`,
       );
       assert.equal(f.events.rolls[0][1], null);
       f.props.notation = '1d1';
@@ -171,7 +171,7 @@ for (const name of components) {
       assert.equal(input.getAttribute('aria-describedby'), 'consumer-help');
       assert.equal(
         f.host.querySelector('output').getAttribute('aria-live'),
-        'off'
+        'off',
       );
     } finally {
       f.close();
@@ -196,11 +196,11 @@ for (const name of components) {
       await settle();
       assert.deepEqual(
         [...host.querySelectorAll('input')].map((input) => input.id),
-        before
+        before,
       );
       assert.deepEqual(
         [...host.querySelectorAll('label')].map((label) => label.htmlFor),
-        before
+        before,
       );
       assert.deepEqual(warnings, []);
     } finally {
@@ -232,8 +232,8 @@ for (const name of ['DiceRoller', 'DiceRollerTailwind']) {
       assert.deepEqual(copied, ['1d1: [1] = 1']);
       assert.ok(
         [...f.host.querySelectorAll('[role="status"]')].some(
-          (node) => node.textContent === 'Result copied'
-        )
+          (node) => node.textContent === 'Result copied',
+        ),
       );
       assert.equal(f.submits(), 0);
       writeText = async () => {
@@ -243,8 +243,8 @@ for (const name of ['DiceRoller', 'DiceRollerTailwind']) {
       await settle();
       assert.ok(
         [...f.host.querySelectorAll('[role="status"]')].some(
-          (node) => node.textContent === 'Copy failed'
-        )
+          (node) => node.textContent === 'Copy failed',
+        ),
       );
       assert.equal(f.submits(), 0);
     } finally {
@@ -273,7 +273,7 @@ test('renderless component supports v-model:notation without feedback loops', as
         {
           default: ({ bind, on }) =>
             h('input', { ...bind, onInput: on.input, onChange: on.change }),
-        }
+        },
       ),
   });
   try {

@@ -30,7 +30,7 @@ watch(
   () => props.notation,
   (notation) => {
     currentNotation.value = notation ?? '';
-  }
+  },
 );
 
 const roll = () => {
@@ -72,14 +72,14 @@ const copied = ref(false);
 const isSupported = useSupported(
   () =>
     typeof navigator !== 'undefined' &&
-    typeof navigator.clipboard?.writeText === 'function'
+    typeof navigator.clipboard?.writeText === 'function',
 );
 const { start: resetCopied, stop: stopResetCopied } = useTimeoutFn(
   () => {
     copied.value = false;
   },
   1500,
-  { immediate: false }
+  { immediate: false },
 );
 const copyOutput = async () => {
   clipboardError.value = null;
