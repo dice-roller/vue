@@ -56,7 +56,7 @@ The optional `labels` object is available on all four components. Each key can b
 | `invalidNotation` | `Invalid notation`                               | Prefix before the parser's error message |
 | `error`           | `An error has occurred`                          | Prefix before other roll error messages  |
 
-The existing `btn-label` prop and `button` slot customise the roll button. Copy controls are provided by the plain and Tailwind components. The renderless component exposes the resolved `labels` and any clipboard failure as `copy.error` through its default slot, so custom interfaces can display and announce these themselves.
+The existing `btn-label` prop and `button` slot customise the roll button. Copy controls are provided by all three HTML components. The renderless component exposes the resolved `labels` and any clipboard failure as `copy.error` through its default slot, so custom interfaces can display and announce these themselves.
 
 ### Tailwind
 
@@ -110,6 +110,14 @@ import { DiceRollerBootstrap } from '@dice-roller/vue';
 ```
 
 The Bootstrap component is wrapped in a [card](https://getbootstrap.com/docs/5.2/components/card/), and uses other bootstrap components. It can be easily styled.
+
+With Bootstrap 5.3+, the component inherits the colour mode of its containing page or element. Set `data-bs-theme="dark"` or `data-bs-theme="light"` on an ancestor, or directly on the component:
+
+```vue
+<DiceRollerBootstrap data-bs-theme="dark" />
+```
+
+The playground's Bootstrap preview follows the system colour preference and updates when it changes. Applications can control their own Bootstrap theme independently.
 
 #### Component reference
 
@@ -281,3 +289,25 @@ npm run format:check
 ```
 
 `lint` and `format:check` do not modify files. Use `npm run lint:fix` and `npm run format` to apply fixes. CI runs linting, formatting, the build and regression tests on Node 22, 24 and 26. A separate job checks the minimum supported Vue 3.5.0.
+
+### Component playground
+
+`npm run dev` opens the playground. Bootstrap and Tailwind are installed through npm as development dependencies; the playground uses no framework CDN.
+
+Each framework is scoped to its own preview component (`.bootstrap-preview` or `.tailwind-preview`) using PostCSS selector prefixes, including framework resets and document-level defaults. The examples render directly on the page, without iframes. The plain component has no framework styles.
+
+The playground lives in `playground/`, separate from the published library in `src/`:
+
+```sh
+npm run build:playground
+npm run preview
+```
+
+This builds into `playground-dist/`. `npm run build` continues to build only the library into `dist/`; preview styles and Bootstrap are not included in the published package.
+
+Browser tests check style isolation, rolling and narrow layouts in both development and production:
+
+```sh
+npx playwright install chromium
+npm run test:playground
+```

@@ -210,7 +210,11 @@ for (const name of components) {
   });
 }
 
-for (const name of ['DiceRoller', 'DiceRollerTailwind']) {
+for (const name of [
+  'DiceRoller',
+  'DiceRollerTailwind',
+  'DiceRollerBootstrap',
+]) {
   test(`${name}: copy never submits, announces success and handles clipboard rejection`, async () => {
     const copied = [];
     writeText = async (value) => copied.push(value);

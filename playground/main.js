@@ -1,6 +1,5 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-
-import './assets/main.css';
+import './styles/playground.css';
 
 createApp(App).mount('#app');

@@ -16,15 +16,17 @@
     }
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --config vite.playground.config.js",
     "build": "vite build",
-    "preview": "vite preview --port 4173",
+    "preview": "vite preview --config vite.playground.config.js --port 4173",
     "lint": "eslint . --max-warnings=0",
     "prepublishOnly": "npm run build",
     "test": "npm run build && node --test tests/*.test.js",
     "lint:fix": "eslint . --fix --max-warnings=0",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "build:playground": "vite build --config vite.playground.config.js",
+    "test:playground": "npm run build:playground && playwright test"
   },
   "repository": {
     "type": "git",
@@ -48,14 +50,17 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.0",
     "@vitejs/plugin-vue": "^6.0.10",
     "autoprefixer": "^10.6.2",
+    "bootstrap": "^5.3.8",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.12.0",
     "globals": "^17.14.0",
     "jsdom": "^31.0.0",
     "postcss": "^8.5.32",
+    "postcss-prefix-selector": "^2.2.1",
     "prettier": "^3.9.10",
     "tailwindcss": "^3.4.19",
     "vite": "^8.3.7",
