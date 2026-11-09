@@ -8,7 +8,7 @@ export default defineConfig({
   build: {
     target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
     lib: {
-      entry: fileURLToPath(new URL('./src/index.js', import.meta.url)),
+      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
       name: 'DiceRollerVue',
       fileName: 'vue',
     },

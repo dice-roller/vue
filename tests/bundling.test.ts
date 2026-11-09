@@ -1,3 +1,4 @@
+import type { DiceRoll } from '@dice-roller/rpg-dice-roller';
 import assert from 'node:assert/strict';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -12,7 +13,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(import.meta.url);
 
 // Bundle a consumer of the built package, resolving its public package export.
-async function bundleConsumer(source) {
+async function bundleConsumer(source: string) {
   const directory = await mkdtemp(`${root}.consumer-`);
   try {
     const entry = `${directory}/entry.js`;
@@ -28,7 +29,10 @@ async function bundleConsumer(source) {
     });
     return [result]
       .flat()
-      .flatMap((result) => result.output)
+      .flatMap((result) => {
+        assert.ok('output' in result);
+        return result.output;
+      })
       .filter((file) => file.type === 'chunk')
       .map((file) => file.code)
       .join('\n');
@@ -51,7 +55,7 @@ test('a composable-only ESM consumer excludes component markup and icons', async
 for (const [component, expected, excluded] of [
   ['DiceRollerTailwind', /--dice-roller-surface/, /form-control/],
   ['DiceRollerBootstrap', /form-control/, /--dice-roller-surface/],
-]) {
+] as const) {
   test(`${component}-only ESM consumer excludes the other styled component`, async () => {
     const code = await bundleConsumer(
       `export { ${component} } from '@dice-roller/vue';`,
@@ -70,21 +74,25 @@ test('unused package imports can be removed entirely', async () => {
 
 test('UMD browser build uses the provided Vue and dice roller library globals', async () => {
   const dice = require('@dice-roller/rpg-dice-roller');
-  const context = { Vue: require('vue'), rpgDiceRoller: dice };
+  const context: {
+    Vue: typeof import('vue');
+    rpgDiceRoller: typeof import('@dice-roller/rpg-dice-roller');
+    DiceRollerVue?: typeof import('@dice-roller/vue');
+  } = { Vue: require('vue'), rpgDiceRoller: dice };
   runInNewContext(await readFile(`${root}dist/vue.umd.cjs`, 'utf8'), context);
-  let result;
+  const captured: { result: DiceRoll | null } = { result: null };
   await renderToString(
     createSSRApp({
       setup() {
-        const { roll, output } = context.DiceRollerVue.useDiceRoller({
+        const { roll, output } = context.DiceRollerVue!.useDiceRoller({
           notation: '2d1',
         });
         roll();
-        result = output.value;
-        return () => h('output', String(result));
+        captured.result = output.value;
+        return () => h('output', String(captured.result));
       },
     }),
   );
-  assert.ok(result instanceof dice.DiceRoll);
-  assert.equal(result.total, 2);
+  assert.ok(captured.result instanceof dice.DiceRoll);
+  assert.equal(captured.result!.total, 2);
 });

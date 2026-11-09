@@ -27,6 +27,32 @@ import { useDiceRoller } from '@dice-roller/vue';
 
 For direct browser script usage, `dist/vue.umd.cjs` expects the globals `Vue` and `rpgDiceRoller`. Load Vue and the dice roller library's UMD build (including its own required dependencies) before this file. Its exported global remains `DiceRollerVue`.
 
+### TypeScript
+
+Type declarations are included for both ESM and CommonJS imports, covering component props, events, slots and the composable. JavaScript usage is unchanged; no separate types package is required.
+
+```vue
+<script setup lang="ts">
+import { useDiceRoller } from '@dice-roller/vue';
+import type { DiceRollerLabels } from '@dice-roller/vue';
+
+const labels: Partial<DiceRollerLabels> = { copy: 'Copy result' };
+const { currentNotation, output, roll } = useDiceRoller({
+  notation: '4d6',
+  labels,
+});
+// currentNotation is a writable string ref; output is DiceRoll | null.
+</script>
+
+<template>
+  <input v-model="currentNotation" />
+  <button type="button" @click="roll">Roll</button>
+  <output>{{ output?.total }}</output>
+</template>
+```
+
+The current v5 dice roller library has errors in its own declarations. TypeScript applications checking dependency declarations may need `skipLibCheck: true`; this project's source and consumer API examples are still checked in strict mode.
+
 ### Components
 
 ### Shared behaviour
@@ -74,7 +100,7 @@ The existing `btn-label` prop and `button` slot customise the roll button. Copy 
 If you're using [Tailwind](https://tailwindcss.com/) v3, you can use the pre-styled Tailwind component:
 
 ```vue
-<script>
+<script setup>
 import { DiceRollerTailwind } from '@dice-roller/vue';
 </script>
 
@@ -196,7 +222,7 @@ export default {
 If you're using [Bootstrap](https://getbootstrap.com/) v5, you can use the Bootstrap component:
 
 ```vue
-<script>
+<script setup>
 import { DiceRollerBootstrap } from '@dice-roller/vue';
 </script>
 
@@ -252,7 +278,7 @@ The playground's Bootstrap preview follows the system colour preference and upda
 There's also a basic component, which provides HTML markup, without any styling. It applies a class to the elements, so you can style it with your own CSS.
 
 ```vue
-<script>
+<script setup>
 import { DiceRoller } from '@dice-roller/vue';
 </script>
 
@@ -384,7 +410,7 @@ The existing components retain their props, events and slots. The three visual c
 If you want to write your own HTML markup, you can use the renderless component instead. This provides the logic and functionality, without any markup, so you can build your own.
 
 ```vue
-<script>
+<script setup>
 import { DiceRollerRenderless } from '@dice-roller/vue';
 </script>
 
@@ -465,9 +491,10 @@ npm run build
 npm run lint
 ```
 
-#### Tests
+#### Type checking and tests
 
 ```sh
+npm run typecheck
 npm test
 ```
 
@@ -478,7 +505,7 @@ npm run lint
 npm run format:check
 ```
 
-`lint` and `format:check` do not modify files. Use `npm run lint:fix` and `npm run format` to apply fixes. CI runs linting, formatting, the build and regression tests on Node 22, 24 and 26. A separate job checks the minimum supported Vue 3.5.0.
+`lint` and `format:check` do not modify files. Use `npm run lint:fix` and `npm run format` to apply fixes. CI runs linting, formatting, the build and regression tests on Node 22, 24 and 26. A separate job checks the minimum supported Vue 3.5.0. Tests are written in TypeScript; `npm test` checks the source, published ESM/CommonJS declarations and Vue consumer templates before running the behavioural tests. `npm run build` generates JavaScript bundles and declarations together.
 
 ### Component playground
 

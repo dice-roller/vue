@@ -1,5 +1,7 @@
+import type { CSSProperties } from 'vue';
+
 // Keep live announcements available without relying on a consumer's CSS framework.
-export const visuallyHiddenStyle = {
+export const visuallyHiddenStyle: CSSProperties = {
   position: 'absolute',
   width: '1px',
   height: '1px',

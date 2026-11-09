@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { usePreferredDark } from '@vueuse/core';
 import DiceRollerBootstrap from '../src/components/DiceRollerBootstrap.vue';
 

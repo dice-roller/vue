@@ -3,3 +3,4 @@ export { default as DiceRollerTailwind } from './components/DiceRollerTailwind.v
 export { default as DiceRollerBootstrap } from './components/DiceRollerBootstrap.vue';
 export { default as DiceRollerRenderless } from './components/DiceRollerRenderless.vue';
 export { useDiceRoller } from './composables/useDiceRoller.js';
+export type * from './types.js';

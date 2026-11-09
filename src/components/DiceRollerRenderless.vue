@@ -1,11 +1,21 @@
-<script setup>
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import type {
+  DiceRollerEmits,
+  DiceRollerLabels,
+  DiceRollerSlotProps,
+} from '../types.js';
 import { useDiceRoller } from '../composables/useDiceRoller.js';
 
-const emit = defineEmits(['notation:change', 'update:notation', 'roll']);
+defineSlots<{
+  default?: (props: DiceRollerSlotProps) => import('vue').VNodeChild;
+}>();
+
+const emit = defineEmits<DiceRollerEmits>();
 const props = defineProps({
   notation: String,
   labels: {
-    type: Object,
+    type: Object as PropType<Partial<DiceRollerLabels>>,
     default: () => ({}),
   },
 });

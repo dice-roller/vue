@@ -12,22 +12,31 @@
   "unpkg": "./dist/vue.umd.cjs",
   "exports": {
     ".": {
-      "import": "./dist/vue.js",
-      "require": "./dist/vue.umd.cjs"
+      "import": {
+        "types": "./dist/types/esm/index.d.ts",
+        "default": "./dist/vue.js"
+      },
+      "require": {
+        "types": "./dist/types/cjs/index.d.ts",
+        "default": "./dist/vue.umd.cjs"
+      }
     }
   },
   "scripts": {
-    "dev": "vite --config vite.playground.config.js",
-    "build": "vite build",
-    "preview": "vite preview --config vite.playground.config.js --port 4173",
+    "dev": "vite --config vite.playground.config.ts",
+    "build": "vite build && npm run build:types",
+    "preview": "vite preview --config vite.playground.config.ts --port 4173",
     "lint": "eslint . --max-warnings=0",
     "prepublishOnly": "npm run build",
-    "test": "npm run build && node --test tests/*.test.js",
+    "test": "npm run build && npm run typecheck && npm run test:types && node --test tests/*.test.ts",
     "lint:fix": "eslint . --fix --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "build:playground": "vite build --config vite.playground.config.js",
-    "test:playground": "npm run build:playground && playwright test"
+    "build:playground": "vite build --config vite.playground.config.ts",
+    "test:playground": "npm run build:playground && playwright test",
+    "build:types": "vue-tsc -p tsconfig.build.json && node scripts/prepare-declarations.ts",
+    "typecheck": "vue-tsc --noEmit",
+    "test:types": "vue-tsc --noEmit -p tests/types/tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -52,6 +61,8 @@
     "@dice-roller/rpg-dice-roller": "^5.5.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.0",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.6",
     "@vitejs/plugin-vue": "^6.0.10",
     "autoprefixer": "^10.6.2",
     "bootstrap": "^5.3.8",
@@ -59,14 +70,18 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.12.0",
     "globals": "^17.14.0",
+    "jiti": "^2.7.0",
     "jsdom": "^31.0.0",
     "postcss": "^8.5.32",
     "postcss-prefix-selector": "^2.2.1",
     "prettier": "^3.9.10",
     "tailwindcss": "^3.4.19",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2",
     "vite": "^8.3.7",
     "vue": "^3.5.45",
-    "vue-eslint-parser": "^10.4.2"
+    "vue-eslint-parser": "^10.4.2",
+    "vue-tsc": "^3.3.14"
   },
   "peerDependencies": {
     "@dice-roller/rpg-dice-roller": "^5.5.0",
@@ -76,5 +91,6 @@
     "eslint": {
       "minimatch": "^11.0.5"
     }
-  }
+  },
+  "types": "./dist/types/esm/index.d.ts"
 }

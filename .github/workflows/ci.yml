@@ -43,8 +43,12 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: npm run build
       - run: npm install --no-save --package-lock=false vue@3.5.0
-      - run: npm test
+      # Verify declarations generated against current Vue with the minimum peer.
+      - run: npm run typecheck
+      - run: npm run test:types
+      - run: node --test tests/*.test.ts
 
   playground:
     name: Playground styles

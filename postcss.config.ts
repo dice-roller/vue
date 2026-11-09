@@ -1,6 +1,8 @@
-const prefixSelector = require('postcss-prefix-selector');
+import prefixSelector from 'postcss-prefix-selector';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 
-function frameworkScope(prefix, file) {
+function frameworkScope(prefix: string, file: RegExp) {
   return prefixSelector({
     prefix,
     includeFiles: [file],
@@ -28,9 +30,9 @@ function frameworkScope(prefix, file) {
   });
 }
 
-module.exports = {
+export default {
   plugins: [
-    require('tailwindcss'),
+    tailwindcss(),
     frameworkScope(
       '.bootstrap-preview',
       /playground[\\/]styles[\\/]bootstrap\.css/,
@@ -39,6 +41,6 @@ module.exports = {
       '.tailwind-preview',
       /playground[\\/]styles[\\/]tailwind\.css/,
     ),
-    require('autoprefixer'),
+    autoprefixer(),
   ],
 };

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 const variants = [
   'primary',
   'secondary',
@@ -31,7 +31,21 @@ const btnVariants = [
 const borderVariants = [...variants, ...['white']];
 </script>
 
-<script setup>
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import type {
+  BootstrapVariant,
+  BootstrapBackgroundVariant,
+  BootstrapBorderVariant,
+  BootstrapTextVariant,
+  BootstrapButtonVariant,
+} from '../types.js';
+import type {
+  DiceRollerEmits,
+  DiceRollerLabels,
+  DiceRollerInputAttrs,
+  DiceRollerSlots,
+} from '../types.js';
 import { computed } from 'vue';
 import { ClipboardIcon } from '@heroicons/vue/24/outline';
 import { visuallyHiddenStyle } from '../accessibility.js';
@@ -40,18 +54,20 @@ import { useIdGenerator } from '../composables/idGenerator.js';
 
 defineOptions({ inheritAttrs: false });
 
-const emit = defineEmits(['notation:change', 'update:notation', 'roll']);
+defineSlots<DiceRollerSlots>();
+
+const emit = defineEmits<DiceRollerEmits>();
 
 const props = defineProps({
   bgVariant: {
-    type: String,
-    validator(value) {
+    type: String as PropType<BootstrapBackgroundVariant>,
+    validator(value: string) {
       return bgVariants.includes(value);
     },
   },
   borderVariant: {
-    type: String,
-    validator(value) {
+    type: String as PropType<BootstrapBorderVariant>,
+    validator(value: string) {
       return borderVariants.includes(value);
     },
   },
@@ -60,52 +76,52 @@ const props = defineProps({
     default: 'Roll',
   },
   btnVariant: {
-    type: String,
+    type: String as PropType<BootstrapButtonVariant>,
     default: 'primary',
-    validator(value) {
+    validator(value: string) {
       return btnVariants.includes(value);
     },
   },
   id: String,
   notation: String,
-  labels: Object,
+  labels: Object as PropType<Partial<DiceRollerLabels>>,
   inputAttrs: {
-    type: Object,
+    type: Object as PropType<DiceRollerInputAttrs>,
     default: () => ({}),
   },
   outputBgVariant: {
-    type: String,
-    validator(value) {
+    type: String as PropType<BootstrapBackgroundVariant>,
+    validator(value: string) {
       return bgVariants.includes(value);
     },
   },
   outputBorderVariant: {
-    type: String,
-    validator(value) {
+    type: String as PropType<BootstrapBorderVariant>,
+    validator(value: string) {
       return borderVariants.includes(value);
     },
   },
   outputTextVariant: {
-    type: String,
-    validator(value) {
+    type: String as PropType<BootstrapTextVariant>,
+    validator(value: string) {
       return textVariants.includes(value);
     },
   },
   outputVariant: {
-    type: String,
-    validator(value) {
+    type: String as PropType<BootstrapVariant>,
+    validator(value: string) {
       return variants.includes(value);
     },
   },
   textVariant: {
-    type: String,
-    validator(value) {
+    type: String as PropType<BootstrapTextVariant>,
+    validator(value: string) {
       return textVariants.includes(value);
     },
   },
   variant: {
-    type: String,
-    validator(value) {
+    type: String as PropType<BootstrapVariant>,
+    validator(value: string) {
       return variants.includes(value);
     },
   },
