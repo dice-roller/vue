@@ -24,10 +24,10 @@ All components accept reactive `notation` updates and support `v-model:notation`
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { DiceRoller } from "@dice-roller/vue";
+import { ref } from 'vue';
+import { DiceRoller } from '@dice-roller/vue';
 
-const notation = ref("4d6");
+const notation = ref('4d6');
 </script>
 
 <template>
@@ -64,11 +64,11 @@ If you're using [Tailwind](https://tailwindcss.com/) v3, you can use the pre-sty
 
 ```vue
 <script>
-import { DiceRollerTailwind } from '@dice-roller/vue'
+import { DiceRollerTailwind } from '@dice-roller/vue';
 </script>
 
 <template>
-    <DiceRollerTailwind />
+  <DiceRollerTailwind />
 </template>
 ```
 
@@ -90,10 +90,10 @@ import { DiceRollerTailwind } from '@dice-roller/vue'
 
 ##### Events
 
-| Event | Arguments | Description |
-| - | - | - |
-| `notation:change` | `notation` - Current value of the notation input | Change event triggered by the user interaction. Emitted after the notation is changed |
-| `roll` | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made |
+| Event             | Arguments                                                                        | Description                                                                           |
+| ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `notation:change` | `notation` - Current value of the notation input                                 | Change event triggered by the user interaction. Emitted after the notation is changed |
+| `roll`            | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made                                                          |
 
 ### Bootstrap
 
@@ -101,11 +101,11 @@ If you're using [Bootstrap](https://getbootstrap.com/) v5, you can use the Boots
 
 ```vue
 <script>
-import { DiceRollerBootstrap } from '@dice-roller/vue'
+import { DiceRollerBootstrap } from '@dice-roller/vue';
 </script>
 
 <template>
-    <DiceRollerBootstrap />
+  <DiceRollerBootstrap />
 </template>
 ```
 
@@ -115,20 +115,20 @@ The Bootstrap component is wrapped in a [card](https://getbootstrap.com/docs/5.2
 
 ##### Properties
 
-| Property                | Type     | Default     | Description                                                  |
-| ----------------------- | -------- | ----------- | ------------------------------------------------------------ |
-| `bg-variant`            | `String` |             | Applies one of the Bootstrap theme colour variants to the background |
-| `border-variant`        | `String` |             | Applies one of the Bootstrap theme colour variants to the border |
-| `btn-label`             | `String` | `"Roll"`    | Text content to place in the button                          |
-| `btn-variant`           | `String` | `"primary"` | Applies one of the Bootstrap theme colour variants to the button |
-| `id`                    | `String` |             | The `id` attribute of the component                          |
-| `notation`              | `String` |             | Notation string to set on the component                      |
-| `output-bg-variant`     | `String` |             | Applies one of the Bootstrap theme colour variants to the background of the output container |
-| `output-border-variant` | `String` |             | Applies one of the Bootstrap theme colour variants to the border of the output container |
-| `output-text-variant`   | `String` |             | Applies one of the Bootstrap theme colour variants to the text of the output container |
+| Property                | Type     | Default     | Description                                                                                                                                                                                                                           |
+| ----------------------- | -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bg-variant`            | `String` |             | Applies one of the Bootstrap theme colour variants to the background                                                                                                                                                                  |
+| `border-variant`        | `String` |             | Applies one of the Bootstrap theme colour variants to the border                                                                                                                                                                      |
+| `btn-label`             | `String` | `"Roll"`    | Text content to place in the button                                                                                                                                                                                                   |
+| `btn-variant`           | `String` | `"primary"` | Applies one of the Bootstrap theme colour variants to the button                                                                                                                                                                      |
+| `id`                    | `String` |             | The `id` attribute of the component                                                                                                                                                                                                   |
+| `notation`              | `String` |             | Notation string to set on the component                                                                                                                                                                                               |
+| `output-bg-variant`     | `String` |             | Applies one of the Bootstrap theme colour variants to the background of the output container                                                                                                                                          |
+| `output-border-variant` | `String` |             | Applies one of the Bootstrap theme colour variants to the border of the output container                                                                                                                                              |
+| `output-text-variant`   | `String` |             | Applies one of the Bootstrap theme colour variants to the text of the output container                                                                                                                                                |
 | `output-variant`        | `String` |             | Applies one of the Bootstrap theme colour variants to the output container. This defines the background colour and contrasting text. See Bootstrap [Color & background](https://getbootstrap.com/docs/5.2/helpers/color-background/). |
-| `text-variant`          | `String` |             | Applies one of the Bootstrap theme colour variants to the text |
-| `variant`               | `String` |             | Applies one of the Bootstrap theme colour variants to the component. This defines the background colour and contrasting text. See Bootstrap [Color & background](https://getbootstrap.com/docs/5.2/helpers/color-background/). |
+| `text-variant`          | `String` |             | Applies one of the Bootstrap theme colour variants to the text                                                                                                                                                                        |
+| `variant`               | `String` |             | Applies one of the Bootstrap theme colour variants to the component. This defines the background colour and contrasting text. See Bootstrap [Color & background](https://getbootstrap.com/docs/5.2/helpers/color-background/).        |
 
 ##### Slots
 
@@ -138,10 +138,10 @@ The Bootstrap component is wrapped in a [card](https://getbootstrap.com/docs/5.2
 
 ##### Events
 
-| Event | Arguments | Description |
-| - | - | - |
-| `notation:change` | `notation` - Current value of the notation input | Change event triggered by the user interaction. Emitted after the notation is changed |
-| `roll` | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made |
+| Event             | Arguments                                                                        | Description                                                                           |
+| ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `notation:change` | `notation` - Current value of the notation input                                 | Change event triggered by the user interaction. Emitted after the notation is changed |
+| `roll`            | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made                                                          |
 
 ### Plain HTML
 
@@ -149,11 +149,11 @@ There's also a basic component, which provides HTML markup, without any styling.
 
 ```vue
 <script>
-import { DiceRoller } from '@dice-roller/vue'
+import { DiceRoller } from '@dice-roller/vue';
 </script>
 
 <template>
-    <DiceRoller />
+  <DiceRoller />
 </template>
 ```
 
@@ -176,10 +176,10 @@ import { DiceRoller } from '@dice-roller/vue'
 
 ##### Events
 
-| Event | Arguments | Description |
-| - | - | - |
-| `notation:change` | `notation` - Current value of the notation input | Change event triggered by the user interaction. Emitted after the notation is changed |
-| `roll` | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made |
+| Event             | Arguments                                                                        | Description                                                                           |
+| ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `notation:change` | `notation` - Current value of the notation input                                 | Change event triggered by the user interaction. Emitted after the notation is changed |
+| `roll`            | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made                                                          |
 
 ### Renderless component
 
@@ -191,21 +191,23 @@ import { DiceRollerRenderless } from '@dice-roller/vue';
 </script>
 
 <template>
-    <DiceRollerRenderless v-slot="{ currentNotation, error, output, roll, on, bind }">
-        <div>
-            <div v-if="error">{{ error }}</div>
+  <DiceRollerRenderless
+    v-slot="{ currentNotation, error, output, roll, on, bind }"
+  >
+    <div>
+      <div v-if="error">{{ error }}</div>
 
-            <input type="text" v-on="on" v-bind="bind" />
-    
-            <button type="button" @click="roll">Roll</button>
+      <input type="text" v-on="on" v-bind="bind" />
 
-            <div>
-                <strong>Notation:</strong> <em>{{ currentNotation }}</em>
-            </div>
+      <button type="button" @click="roll">Roll</button>
 
-            <output v-if="output">{{ output }}</output>
-          </div>
-    </DiceRollerRenderless>
+      <div>
+        <strong>Notation:</strong> <em>{{ currentNotation }}</em>
+      </div>
+
+      <output v-if="output">{{ output }}</output>
+    </div>
+  </DiceRollerRenderless>
 </template>
 ```
 
@@ -225,10 +227,10 @@ import { DiceRollerRenderless } from '@dice-roller/vue';
 
 ##### Events
 
-| Event | Arguments | Description |
-| - | - | - |
-| `notation:change` | `notation` - Current value of the notation input | Change event triggered by the user interaction. Emitted after the notation is changed |
-| `roll` | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made |
+| Event             | Arguments                                                                        | Description                                                                           |
+| ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `notation:change` | `notation` - Current value of the notation input                                 | Change event triggered by the user interaction. Emitted after the notation is changed |
+| `roll`            | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made                                                          |
 
 ## Development
 
@@ -238,9 +240,14 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ### Project Setup
 
+Use the Node version in `.nvmrc` (Node 24). Development tooling requires Node 22.22.2+, 24.15.0+, or 26+. Install the checkout's dependencies:
+
 ```sh
-npm install @dice-roller/vue
+nvm use
+npm ci
 ```
+
+Vue is installed locally for development while remaining a peer dependency for consumers. Tailwind is updated within v3; migration to v4 is a separate change.
 
 #### Compile and Hot-Reload for Development
 
@@ -265,3 +272,12 @@ npm run lint
 ```sh
 npm test
 ```
+
+#### Code quality and CI
+
+```sh
+npm run lint
+npm run format:check
+```
+
+`lint` and `format:check` do not modify files. Use `npm run lint:fix` and `npm run format` to apply fixes. CI runs linting, formatting, the build and regression tests on Node 22, 24 and 26. A separate job checks the minimum supported Vue 3.5.0.

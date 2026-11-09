@@ -1,18 +1,18 @@
-import { fileURLToPath, URL } from 'node:url'
+import { fileURLToPath, URL } from 'node:url';
 
-import { resolve } from 'path'
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
+    target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
     lib: {
-      entry: resolve(__dirname, 'src/index.js'),
+      entry: fileURLToPath(new URL('./src/index.js', import.meta.url)),
       name: 'DiceRollerVue',
       fileName: 'vue',
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: ['vue'],
       output: {
         globals: {
@@ -24,7 +24,7 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  }
-})
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+});
