@@ -72,6 +72,91 @@ import { DiceRollerTailwind } from '@dice-roller/vue';
 </template>
 ```
 
+#### Customising colours
+
+The Tailwind component uses CSS custom properties for its colours. Its defaults include a pastel button gradient, light surfaces in light mode, and deep slate input and result surfaces in dark mode. No additional stylesheet or theme prop is needed.
+
+Set variables in your global CSS to theme every instance:
+
+```css
+:root {
+  --dice-roller-primary: #7c3aed;
+  --dice-roller-primary-hover: #6d28d9;
+  --dice-roller-on-primary: #fff;
+}
+```
+
+`primary` colours the button, output accent and input/button focus border and ring. Setting it makes both button gradient stops the same colour, producing a solid button. `primary-hover` applies on hover and focus; if omitted, these use `primary` too. Keyboard focus outlines remain independently customisable.
+
+Variables also inherit from a containing element, or can be set on one component using its `class` or `style`:
+
+```vue
+<DiceRollerTailwind
+  style="--dice-roller-primary: #0369a1; --dice-roller-primary-hover: #075985; --dice-roller-on-primary: #fff"
+/>
+```
+
+To keep a gradient, override the individual stops instead:
+
+```css
+.my-dice-theme {
+  --dice-roller-button-from: #c4b5fd;
+  --dice-roller-button-to: #bae6fd;
+  --dice-roller-button-hover-from: #a78bfa;
+  --dice-roller-button-hover-to: #7dd3fc;
+}
+```
+
+```vue
+<DiceRollerTailwind class="my-dice-theme" />
+```
+
+All names below have the prefix `--dice-roller-`. Colours accept normal CSS colour values, including your own `var(...)` references or Tailwind's `theme(...)` function in CSS processed by Tailwind.
+
+| Variable                  | Default / fallback                              | Purpose                                               |
+| ------------------------- | ----------------------------------------------- | ----------------------------------------------------- |
+| `primary`                 | Existing colours below                          | Shared button, output accent and focus colour         |
+| `primary-hover`           | `primary`, then existing hover colours          | Button hover/focus colour                             |
+| `on-primary`              | `#111827`; `#1f2937` on hover/focus             | Button text                                           |
+| `surface`                 | `#f1f5f9` / dark `#4b5563`                      | Outer background                                      |
+| `text`                    | `#1f2937` / dark `#e5e7eb`                      | Outer text                                            |
+| `border`                  | `#d1d5db` / dark `#374151`                      | Input and button borders                              |
+| `output-surface`          | `#fff` / dark `#1e293b`                         | Result background                                     |
+| `output-text`             | `#000` / dark `#e2e8f0`                         | Result and copy icon text                             |
+| `output-accent`           | `primary`, then `#d4f4c6` / dark `#6b8f63`      | Result's left border                                  |
+| `input-surface`           | `#fff` / dark `#0f172a`                         | Input background                                      |
+| `input-text`              | `#111827` / dark `#e2e8f0`                      | Input text                                            |
+| `input-placeholder`       | `#6b7280` / dark `#94a3b8`                      | Input placeholder                                     |
+| `input-placeholder-focus` | `#9ca3af` / dark `#94a3b8`                      | Focused input placeholder                             |
+| `focus`                   | `primary`, then `#d4f4c6`                       | Input/button focus border and ring                    |
+| `focus-outline`           | `#1f2937` / dark `#fff`                         | Keyboard focus outline for the input and both buttons |
+| `error`                   | `#b91c1c` / dark `#fecaca`                      | Validation and copy error messages                    |
+| `input-error-text`        | `error`, then `#b91c1c`                         | Invalid input text                                    |
+| `input-error-border`      | `#fecaca`                                       | Invalid input border                                  |
+| `input-error-surface`     | `#fef2f2`                                       | Invalid input background                              |
+| `button-from`             | `primary`, then `#eda18b`                       | First button gradient stop                            |
+| `button-to`               | `primary`, then `#d4f4c6`                       | Second button gradient stop                           |
+| `button-hover-from`       | `primary-hover`, then `primary`, then `#e88c71` | First hover/focus gradient stop                       |
+| `button-hover-to`         | `primary-hover`, then `primary`, then `#bbf0a3` | Second hover/focus gradient stop                      |
+| `copy-surface`            | `#111827`                                       | Copied confirmation background                        |
+| `copy-text`               | `#fff`                                          | Copied confirmation text                              |
+
+Where the table lists a distinct dark default, a corresponding `-dark` variable is available (for example, `--dice-roller-surface-dark`). In dark mode this takes precedence over the base variable, followed by the existing dark default. A base override therefore applies in both modes unless a `-dark` override is supplied.
+
+Dark mode still follows your application's Tailwind v3 `darkMode` configuration. You can also override any base variables within your application's own dark theme selector. The component does not switch themes itself.
+
+Make sure Tailwind scans the installed library so it generates the component's utility classes, including its variable-based colours:
+
+```js
+// tailwind.config.js (merge with your existing content paths)
+export default {
+  content: [
+    './src/**/*.{vue,js,ts}',
+    './node_modules/@dice-roller/vue/dist/*.js',
+  ],
+};
+```
+
 #### Component reference
 
 ##### Properties
