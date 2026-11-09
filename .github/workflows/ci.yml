@@ -33,8 +33,8 @@ jobs:
       - run: npm test
       - run: npm run build:playground
 
-  minimum-vue:
-    name: Minimum supported Vue
+  current-vue:
+    name: Current supported Vue
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -44,8 +44,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npm install --no-save --package-lock=false vue@3.5.0
-      # Verify declarations generated against current Vue with the minimum peer.
+      - run: npm install --no-save --package-lock=false vue@^3.5.0
+      # Verify declarations generated against minimum Vue with current compatible Vue.
       - run: npm run typecheck
       - run: npm run test:types
       - run: node --test tests/*.test.ts

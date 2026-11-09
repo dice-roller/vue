@@ -15,3 +15,8 @@ roller.currentNotation.value = false;
 export const componentProps: InstanceType<
   typeof library.DiceRollerBootstrap
 >['$props'] = { notation: '4d6' };
+
+export const badCjsProps: InstanceType<typeof library.DiceRoller>['$props'] = {
+  // @ts-expect-error Component props must also be checked in CommonJS.
+  notation: 42,
+};

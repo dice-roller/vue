@@ -15,12 +15,12 @@
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.mts",
     "src/**/*.vue",
     "playground/**/*.ts",
     "playground/**/*.vue",
     "tests/**/*.ts",
-    "*.ts",
-    "scripts/**/*.ts"
+    "*.ts"
   ],
   "exclude": ["tests/types"]
 }

@@ -505,7 +505,7 @@ npm run lint
 npm run format:check
 ```
 
-`lint` and `format:check` do not modify files. Use `npm run lint:fix` and `npm run format` to apply fixes. CI runs linting, formatting, the build and regression tests on Node 22, 24 and 26. A separate job checks the minimum supported Vue 3.5.0. Tests are written in TypeScript; `npm test` checks the source, published ESM/CommonJS declarations and Vue consumer templates before running the behavioural tests. `npm run build` generates JavaScript bundles and declarations together.
+`lint` and `format:check` do not modify files. Use `npm run lint:fix` and `npm run format` to apply fixes. CI runs linting, formatting, the build and regression tests on Node 22, 24 and 26. Development Vue is pinned to the minimum supported 3.5.0 so `vue-tsc` generates compatible declarations directly. A separate CI job checks those declarations and runtime behaviour with current compatible Vue. Tests are written in TypeScript; `npm test` checks the source, published ESM/CommonJS declarations and Vue consumer templates before running the behavioural tests. `npm run build` generates JavaScript bundles and declarations together.
 
 ### Component playground
 

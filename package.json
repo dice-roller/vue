@@ -13,11 +13,11 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/types/esm/index.d.ts",
+        "types": "./dist/types/index.d.mts",
         "default": "./dist/vue.js"
       },
       "require": {
-        "types": "./dist/types/cjs/index.d.ts",
+        "types": "./dist/types/index.d.ts",
         "default": "./dist/vue.umd.cjs"
       }
     }
@@ -34,7 +34,7 @@
     "format:check": "prettier --check .",
     "build:playground": "vite build --config vite.playground.config.ts",
     "test:playground": "npm run build:playground && playwright test",
-    "build:types": "vue-tsc -p tsconfig.build.json && node scripts/prepare-declarations.ts",
+    "build:types": "vue-tsc -p tsconfig.build.json",
     "typecheck": "vue-tsc --noEmit",
     "test:types": "vue-tsc --noEmit -p tests/types/tsconfig.json"
   },
@@ -79,7 +79,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.2",
     "vite": "^8.3.7",
-    "vue": "^3.5.45",
+    "vue": "3.5.0",
     "vue-eslint-parser": "^10.4.2",
     "vue-tsc": "^3.3.14"
   },
@@ -92,5 +92,5 @@
       "minimatch": "^11.0.5"
     }
   },
-  "types": "./dist/types/esm/index.d.ts"
+  "types": "./dist/types/index.d.mts"
 }

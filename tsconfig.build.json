@@ -5,8 +5,8 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "rootDir": "src",
-    "outDir": "dist/types/esm"
+    "outDir": "dist/types"
   },
-  "include": ["src/**/*.ts", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.mts", "src/**/*.vue"],
   "exclude": []
 }
