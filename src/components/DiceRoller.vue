@@ -1,4 +1,11 @@
-<script setup>
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import type {
+  DiceRollerEmits,
+  DiceRollerLabels,
+  DiceRollerInputAttrs,
+  DiceRollerSlots,
+} from '../types.js';
 import { visuallyHiddenStyle } from '../accessibility.js';
 import { useDiceRoller } from '../composables/useDiceRoller.js';
 import { useIdGenerator } from '../composables/idGenerator.js';
@@ -6,7 +13,9 @@ import { ClipboardIcon } from '@heroicons/vue/24/outline';
 
 defineOptions({ inheritAttrs: false });
 
-const emit = defineEmits(['notation:change', 'update:notation', 'roll']);
+defineSlots<DiceRollerSlots>();
+
+const emit = defineEmits<DiceRollerEmits>();
 
 const props = defineProps({
   btnLabel: {
@@ -19,9 +28,9 @@ const props = defineProps({
   },
   id: String,
   notation: String,
-  labels: Object,
+  labels: Object as PropType<Partial<DiceRollerLabels>>,
   inputAttrs: {
-    type: Object,
+    type: Object as PropType<DiceRollerInputAttrs>,
     default: () => ({}),
   },
 });

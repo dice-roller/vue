@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import BootstrapPreview from './BootstrapPreview.vue';
 import TailwindPreview from './TailwindPreview.vue';
 import RenderlessExample from './RenderlessExample.vue';

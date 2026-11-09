@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import DiceRollerRenderless from '../src/components/DiceRollerRenderless.vue';
 </script>
 

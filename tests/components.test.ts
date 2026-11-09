@@ -1,3 +1,10 @@
+import type { Component } from 'vue';
+import type { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import type {
+  UseDiceRollerOptions,
+  UseDiceRollerReturn,
+  DiceRollerSlotProps,
+} from '@dice-roller/vue';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { JSDOM } from 'jsdom';
@@ -13,30 +20,67 @@ for (const key of [
   'SVGElement',
   'Node',
 ]) {
-  globalThis[key] = key === 'window' ? dom.window : dom.window[key];
+  Object.defineProperty(globalThis, key, {
+    value: dom.window[key as keyof typeof dom.window],
+    configurable: true,
+  });
 }
 Object.defineProperty(globalThis, 'navigator', {
   value: dom.window.navigator,
   configurable: true,
 });
-let writeText = async () => {};
+let writeText: (value: string) => Promise<void> = async () => {};
 Object.defineProperty(navigator, 'clipboard', {
-  value: { writeText: (value) => writeText(value) },
+  value: { writeText: (value: string) => writeText(value) },
 });
 document.execCommand = () => false;
 const { createApp, createSSRApp, h, nextTick, reactive, ref } =
   await import('vue');
 const { renderToString } = await import('vue/server-renderer');
-const library = await import('../dist/vue.js');
-const components = ['DiceRoller', 'DiceRollerTailwind', 'DiceRollerBootstrap'];
+const library = await import('@dice-roller/vue');
+const components = [
+  'DiceRoller',
+  'DiceRollerTailwind',
+  'DiceRollerBootstrap',
+] as const;
+function inputEvent(value: string): Event {
+  const input = document.createElement('input');
+  input.value = value;
+  const event = new window.Event('input');
+  Object.defineProperty(event, 'target', { value: input });
+  return event;
+}
+function query<K extends keyof HTMLElementTagNameMap>(
+  root: ParentNode,
+  selector: K,
+): HTMLElementTagNameMap[K];
+function query(root: ParentNode, selector: 'output button'): HTMLButtonElement;
+function query(root: ParentNode, selector: string): HTMLElement;
+function query(root: ParentNode, selector: string): HTMLElement {
+  const element = root.querySelector<HTMLElement>(selector);
+  assert.ok(element, `Missing ${selector}`);
+  return element;
+}
+
 const settle = async () => {
   await nextTick();
   await new Promise((resolve) => setTimeout(resolve, 0));
 };
 
-function mount(component, initialProps = {}) {
-  const props = reactive({ notation: '1d1', ...initialProps });
-  const events = { rolls: [], changes: [], updates: [], warnings: [] };
+function mount(
+  component: Component,
+  initialProps: Record<string, unknown> = {},
+) {
+  const props = reactive<Record<string, unknown>>({
+    notation: '1d1',
+    ...initialProps,
+  });
+  const events = {
+    rolls: [] as [string, DiceRoll | null][],
+    changes: [] as string[],
+    updates: [] as string[],
+    warnings: [] as string[],
+  };
   const host = document.createElement('form');
   document.body.append(host);
   let submits = 0;
@@ -48,9 +92,9 @@ function mount(component, initialProps = {}) {
     render: () =>
       h(component, {
         ...props,
-        onRoll: (...args) => events.rolls.push(args),
-        'onNotation:change': (value) => events.changes.push(value),
-        'onUpdate:notation': (value) => events.updates.push(value),
+        onRoll: (...args: [string, DiceRoll | null]) => events.rolls.push(args),
+        'onNotation:change': (value: string) => events.changes.push(value),
+        'onUpdate:notation': (value: string) => events.updates.push(value),
       }),
   });
   app.config.warnHandler = (message) => events.warnings.push(message);
@@ -76,22 +120,22 @@ for (const name of components) {
       inputAttrs: { 'aria-label': 'Custom notation', autocomplete: 'off' },
     });
     try {
-      const root = f.host.querySelector('.dice-roller');
+      const root = query(f.host, '.dice-roller');
       assert.ok(root.classList.contains('consumer-class'));
       assert.equal(root.style.marginTop, '3px');
       assert.equal(root.dataset.consumer, 'yes');
-      const input = f.host.querySelector('input');
-      const announcement = root.querySelector('[role="status"]');
+      const input = query(f.host, 'input');
+      const announcement = query(root, '[role="status"]');
       assert.equal(announcement.textContent, '');
       assert.equal(input.getAttribute('aria-label'), 'Custom notation');
       f.props.notation = '2d1';
       await settle();
       assert.equal(input.value, '2d1');
       assert.deepEqual(f.events.changes, []);
-      f.host.querySelector('button').click();
+      query(f.host, 'button').click();
       await settle();
       assert.equal(f.events.rolls[0][0], '2d1');
-      assert.equal(f.events.rolls[0][1].total, 2);
+      assert.equal(f.events.rolls[0][1]!.total, 2);
       assert.ok(announcement.isConnected);
       assert.equal(announcement.textContent, '2d1: [1, 1] = 2');
       input.value = '3d1';
@@ -109,7 +153,7 @@ for (const name of components) {
   test(`${name}: Enter is form-safe, ignores composition and key repeats`, async () => {
     const f = mount(library[name]);
     try {
-      const input = f.host.querySelector('input');
+      const input = query(f.host, 'input');
       for (const options of [{ isComposing: true }, { repeat: true }]) {
         input.dispatchEvent(
           new window.KeyboardEvent('keydown', {
@@ -150,13 +194,13 @@ for (const name of components) {
       inputAttrs: { 'aria-describedby': 'consumer-help' },
     });
     try {
-      const input = f.host.querySelector('input');
-      const label = f.host.querySelector('label');
+      const input = query(f.host, 'input');
+      const label = query(f.host, 'label');
       assert.equal(label.textContent.trim(), 'Dice expression');
       assert.equal(label.htmlFor, input.id);
-      f.host.querySelector('button').click();
+      query(f.host, 'button').click();
       await settle();
-      const error = f.host.querySelector('[role="alert"]');
+      const error = query(f.host, '[role="alert"]');
       assert.match(error.textContent, /Please check your dice/);
       assert.equal(input.getAttribute('aria-invalid'), 'true');
       assert.equal(
@@ -166,14 +210,11 @@ for (const name of components) {
       assert.equal(f.events.rolls[0][1], null);
       f.props.notation = '1d1';
       await settle();
-      f.host.querySelector('button').click();
+      query(f.host, 'button').click();
       await settle();
       assert.equal(input.getAttribute('aria-invalid'), null);
       assert.equal(input.getAttribute('aria-describedby'), 'consumer-help');
-      assert.equal(
-        f.host.querySelector('output').getAttribute('aria-live'),
-        'off',
-      );
+      assert.equal(query(f.host, 'output').getAttribute('aria-live'), 'off');
     } finally {
       f.close();
     }
@@ -190,7 +231,7 @@ for (const name of components) {
     const before = [...host.querySelectorAll('input')].map((input) => input.id);
     assert.equal(new Set(before).size, 2);
     const app = createSSRApp(Root);
-    const warnings = [];
+    const warnings: string[] = [];
     app.config.warnHandler = (message) => warnings.push(message);
     try {
       app.mount(host);
@@ -211,14 +252,12 @@ for (const name of components) {
   });
 }
 
-for (const name of [
-  'DiceRoller',
-  'DiceRollerTailwind',
-  'DiceRollerBootstrap',
-]) {
+for (const name of components) {
   test(`${name}: copy never submits, announces success and handles clipboard rejection`, async () => {
-    const copied = [];
-    writeText = async (value) => copied.push(value);
+    const copied: string[] = [];
+    writeText = async (value) => {
+      copied.push(value);
+    };
     const f = mount(library[name], {
       labels: {
         copy: 'Copy result',
@@ -227,9 +266,9 @@ for (const name of [
       },
     });
     try {
-      f.host.querySelector('button').click();
+      query(f.host, 'button').click();
       await settle();
-      const button = f.host.querySelector('output button');
+      const button = query(f.host, 'output button');
       assert.equal(button.type, 'button');
       assert.equal(button.getAttribute('aria-label'), 'Copy result');
       button.click();
@@ -270,20 +309,20 @@ test('renderless component supports v-model:notation without feedback loops', as
         library.DiceRollerRenderless,
         {
           notation: notation.value,
-          'onUpdate:notation': (value) => {
+          'onUpdate:notation': (value: string) => {
             updates++;
             notation.value = value;
           },
         },
         {
-          default: ({ bind, on }) =>
+          default: ({ bind, on }: DiceRollerSlotProps) =>
             h('input', { ...bind, onInput: on.input, onChange: on.change }),
         },
       ),
   });
   try {
     app.mount(host);
-    const input = host.querySelector('input');
+    const input = query(host, 'input');
     input.value = '2d1';
     input.dispatchEvent(new window.Event('input'));
     await settle();
@@ -299,10 +338,10 @@ test('renderless component supports v-model:notation without feedback loops', as
   }
 });
 
-function mountRollers(...options) {
+function mountRollers(...options: UseDiceRollerOptions[]) {
   const host = document.createElement('div');
   document.body.append(host);
-  let rollers;
+  let rollers!: UseDiceRollerReturn[];
   const app = createApp({
     setup() {
       rollers = options.map((option) => library.useDiceRoller(option));
@@ -320,12 +359,12 @@ function mountRollers(...options) {
 }
 
 test('composable accepts refs/getters and local v-model edits without source feedback loops', async () => {
-  const notation = ref('1d1');
+  const notation = ref<string | undefined>('1d1');
   const props = reactive({
     notation: '2d1',
     labels: { invalidNotation: 'Check dice' },
   });
-  const changes = [];
+  const changes: string[] = [];
   const f = mountRollers(
     {
       notation,
@@ -339,7 +378,7 @@ test('composable accepts refs/getters and local v-model edits without source fee
   try {
     const [first, second] = f.rollers;
     first.currentNotation.value = '3d1';
-    first.on.change({ target: { value: '3d1' } });
+    first.on.change(inputEvent('3d1'));
     await settle();
     assert.deepEqual(changes, ['3d1']);
     assert.equal(notation.value, '3d1');
@@ -351,7 +390,7 @@ test('composable accepts refs/getters and local v-model edits without source fee
     assert.equal(first.currentNotation.value, '4d1');
     assert.deepEqual(changes, ['3d1']);
     second.roll();
-    assert.match(second.error.value, /^Updated label:/);
+    assert.match(second.error.value!, /^Updated label:/);
     assert.equal(second.labels.value.copy, 'Copy to clipboard');
     assert.equal(first.error.value, null);
     notation.value = undefined;
@@ -363,19 +402,24 @@ test('composable accepts refs/getters and local v-model edits without source fee
 });
 
 test('composable keeps rolls, validation and clipboard state independent per call', async () => {
-  const rolls = [];
+  const rolls: [string, DiceRoll | null][] = [];
   const f = mountRollers(
-    { notation: '2d1', onRoll: (...args) => rolls.push(args) },
+    {
+      notation: '2d1',
+      onRoll: (...args: [string, DiceRoll | null]) => rolls.push(args),
+    },
     {},
   );
-  const copied = [];
-  writeText = async (value) => copied.push(value);
+  const copied: string[] = [];
+  writeText = async (value) => {
+    copied.push(value);
+  };
   try {
     const [first, second] = f.rollers;
     assert.equal(second.currentNotation.value, '');
     assert.equal(first.copy.isSupported, true);
     first.roll();
-    assert.equal(first.output.value.total, 2);
+    assert.equal(first.output.value!.total, 2);
     assert.equal(rolls[0][0], '2d1');
     assert.equal(rolls[0][1], first.output.value);
     assert.equal(second.output.value, null);
@@ -394,7 +438,7 @@ test('composable keeps rolls, validation and clipboard state independent per cal
     first.setNotation('invalid notation');
     first.roll();
     assert.equal(first.output.value, null);
-    assert.match(first.error.value, /^Invalid notation:/);
+    assert.match(first.error.value!, /^Invalid notation:/);
     assert.equal(first.copy.error, null);
     assert.equal(rolls[1][1], null);
     first.setNotation('');
@@ -412,20 +456,25 @@ test('composable keeps rolls, validation and clipboard state independent per cal
 test('renderless adapter preserves its slot contract and ordered events', async () => {
   const host = document.createElement('div');
   document.body.append(host);
-  const events = [];
-  let state;
+  const events: (
+    ['update' | 'change', string] | ['roll', string, DiceRoll | null]
+  )[] = [];
+  let state!: DiceRollerSlotProps;
   const app = createApp({
     render: () =>
       h(
         library.DiceRollerRenderless,
         {
           notation: '1d1',
-          'onUpdate:notation': (value) => events.push(['update', value]),
-          'onNotation:change': (value) => events.push(['change', value]),
-          onRoll: (...args) => events.push(['roll', ...args]),
+          'onUpdate:notation': (value: string) =>
+            events.push(['update', value]),
+          'onNotation:change': (value: string) =>
+            events.push(['change', value]),
+          onRoll: (...args: [string, DiceRoll | null]) =>
+            events.push(['roll', ...args]),
         },
         {
-          default: (slot) => {
+          default: (slot: DiceRollerSlotProps) => {
             state = slot;
             return h('div');
           },
@@ -452,8 +501,8 @@ test('renderless adapter preserves its slot contract and ordered events', async 
       'text',
     ]);
     assert.equal(state.currentNotation, '1d1');
-    state.on.input({ target: { value: '2d1' } });
-    state.on.change({ target: { value: '2d1' } });
+    state.on.input(inputEvent('2d1'));
+    state.on.change(inputEvent('2d1'));
     await settle();
     assert.equal(state.bind.value, '2d1');
     assert.deepEqual(events, [
@@ -464,8 +513,8 @@ test('renderless adapter preserves its slot contract and ordered events', async 
     await settle();
     assert.equal(events[2][0], 'roll');
     assert.equal(events[2][1], '2d1');
-    assert.equal(events[2][2].total, 2);
-    assert.equal(state.output.total, 2);
+    assert.equal((events[2] as ['roll', string, DiceRoll])[2].total, 2);
+    assert.equal(state.output!.total, 2);
   } finally {
     app.unmount();
     host.remove();

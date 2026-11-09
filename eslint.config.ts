@@ -3,6 +3,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import prettier from 'eslint-config-prettier/flat';
 import vue from 'eslint-plugin-vue';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   globalIgnores([
@@ -14,22 +15,19 @@ export default defineConfig([
     'playwright-report/**',
   ]),
   js.configs.recommended,
+  ...tseslint.configs.recommended,
   ...vue.configs['flat/essential'],
   {
-    files: [
-      'src/**/*.{js,vue}',
-      'playground/**/*.{js,vue}',
-      'tests/browser/**/*.js',
-    ],
-    languageOptions: { globals: globals.browser },
+    files: ['**/*.vue'],
+    languageOptions: { parserOptions: { parser: tseslint.parser } },
   },
   {
-    files: ['*.js', '*.cjs', 'tests/**/*.js'],
-    languageOptions: { globals: globals.node },
+    files: ['**/*.ts', '**/*.vue'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   {
-    files: ['tests/**/*.js'],
-    languageOptions: { globals: globals.browser },
+    files: ['tests/types/*.cts'],
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
   prettier,
 ]);

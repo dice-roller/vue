@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import DiceRollerTailwind from '../src/components/DiceRollerTailwind.vue';
 </script>
 

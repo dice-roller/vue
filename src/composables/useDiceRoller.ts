@@ -1,14 +1,17 @@
 import { computed, reactive, ref, toValue, watch } from 'vue';
+import type { UseDiceRollerOptions, UseDiceRollerReturn } from '../types.js';
 import { DiceRoll } from '@dice-roller/rpg-dice-roller';
 import { useSupported, useTimeoutFn } from '@vueuse/core';
 
 /**
- * Create an independent dice roller inside setup() or <script setup>.
+ * Create an independent dice roller inside setup() or <script setup lang="ts">.
  * notation and labels accept plain values, refs or getters.
  * Source updates are silent; local edits call onNotationChange once.
  * onRoll receives (notation, result), including null for empty/failed rolls.
  */
-export function useDiceRoller(options = {}) {
+export function useDiceRoller(
+  options: UseDiceRollerOptions = {},
+): UseDiceRollerReturn {
   const labels = computed(() => ({
     notation: 'Notation',
     copy: 'Copy to clipboard',
@@ -19,9 +22,9 @@ export function useDiceRoller(options = {}) {
     ...toValue(options.labels),
   }));
   const notationValue = ref(toValue(options.notation) ?? '');
-  const error = ref(null);
-  const output = ref(null);
-  const clipboardError = ref(null);
+  const error = ref<string | null>(null);
+  const output = ref<DiceRoll | null>(null);
+  const clipboardError = ref<string | null>(null);
 
   watch(
     () => toValue(options.notation),
@@ -37,7 +40,8 @@ export function useDiceRoller(options = {}) {
       output.value = notationValue.value
         ? new DiceRoll(notationValue.value)
         : null;
-    } catch (e) {
+    } catch (cause) {
+      const e = cause as Error;
       output.value = null;
       error.value = `${
         e.name === 'SyntaxError'
@@ -49,7 +53,7 @@ export function useDiceRoller(options = {}) {
     }
   };
 
-  const setNotation = (notation) => {
+  const setNotation = (notation: string) => {
     if (notationValue.value === notation) return;
     notationValue.value = notation;
     options.onNotationChange?.(notation);
@@ -60,11 +64,16 @@ export function useDiceRoller(options = {}) {
     set: setNotation,
   });
 
-  const onKeydown = (event) => {
+  const onKeydown = (event: KeyboardEvent) => {
     if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229)
       return;
     event.preventDefault();
-    if (!event.repeat && !event.target?.disabled && notationValue.value) roll();
+    if (
+      !event.repeat &&
+      !(event.target as HTMLInputElement | null)?.disabled &&
+      notationValue.value
+    )
+      roll();
   };
 
   const source = computed(() => (output.value ? String(output.value) : ''));
@@ -100,8 +109,10 @@ export function useDiceRoller(options = {}) {
 
   const bind = computed(() => ({ value: currentNotation.value }));
   const on = {
-    input: (event) => setNotation(event.target.value),
-    change: (event) => setNotation(event.target.value),
+    input: (event: Event) =>
+      setNotation((event.target as HTMLInputElement).value),
+    change: (event: Event) =>
+      setNotation((event.target as HTMLInputElement).value),
     keydown: onKeydown,
   };
   const copy = reactive({

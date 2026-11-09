@@ -4,8 +4,8 @@ test('npm frameworks coexist without styling each other or the plain example', a
   page,
   baseURL,
 }) => {
-  const expectedOrigin = new URL(baseURL).origin;
-  const external = [];
+  const expectedOrigin = new URL(baseURL!).origin;
+  const external: string[] = [];
   page.on('request', (request) => {
     if (!request.url().startsWith(expectedOrigin)) external.push(request.url());
   });
@@ -23,7 +23,7 @@ test('npm frameworks coexist without styling each other or the plain example', a
     ].map((selector) => {
       const probe = document.createElement('div');
       probe.className = 'p-4';
-      document.querySelector(selector).append(probe);
+      document.querySelector(selector)!.append(probe);
       const value = getComputedStyle(probe).paddingTop;
       probe.remove();
       return value;
@@ -91,7 +91,9 @@ test('Tailwind roll button keeps its label and padding at different widths', asy
     expect(label.lines).toBe(1);
     expect(label.width).toBeGreaterThanOrEqual(label.textWidth + label.padding);
     const inputBox = await input.boundingBox();
+    if (!inputBox) throw new Error('Missing inputBox');
     const buttonBox = await button.boundingBox();
+    if (!buttonBox) throw new Error('Missing buttonBox');
     if (width >= 640) {
       expect(Math.abs(inputBox.y - buttonBox.y)).toBeLessThan(1);
       expect(Math.abs(inputBox.x + inputBox.width - buttonBox.x)).toBeLessThan(
@@ -175,7 +177,7 @@ for (const { name, selector, badgeBackground } of [
       exact: true,
     });
 
-    for (const colorScheme of ['light', 'dark']) {
+    for (const colorScheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme });
       const icon = copy.locator('svg');
       await expect(icon).toHaveCSS('width', '24px');
@@ -188,6 +190,7 @@ for (const { name, selector, badgeBackground } of [
           colorScheme === 'dark' ? 'rgb(255, 255, 255)' : 'rgb(0, 0, 0)',
         );
         const target = await copy.boundingBox();
+        if (!target) throw new Error('Missing target');
         expect(target.width).toBeGreaterThanOrEqual(40);
         expect(target.height).toBeGreaterThanOrEqual(40);
         await expect(copy).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
@@ -209,13 +212,17 @@ for (const { name, selector, badgeBackground } of [
       });
       expect(text.lines).toBe(1);
       const labelBox = await confirmation.boundingBox();
+      if (!labelBox) throw new Error('Missing labelBox');
       const iconBox = await copy.locator('svg').boundingBox();
+      if (!iconBox) throw new Error('Missing iconBox');
       if (name === 'Bootstrap') {
         const outputBox = await example.locator('output').boundingBox();
+        if (!outputBox) throw new Error('Missing outputBox');
         const resultBox = await example
           .locator('output > span')
           .first()
           .boundingBox();
+        if (!resultBox) throw new Error('Missing resultBox');
         expect(iconBox.x).toBeGreaterThan(resultBox.x + resultBox.width);
         expect(iconBox.x + iconBox.width).toBeLessThanOrEqual(
           outputBox.x + outputBox.width,
@@ -234,7 +241,7 @@ for (const { name, selector, badgeBackground } of [
   });
 }
 
-for (const colorScheme of ['light', 'dark']) {
+for (const colorScheme of ['light', 'dark'] as const) {
   test(`Tailwind theme defaults preserve the ${colorScheme} palette and interaction colours`, async ({
     page,
   }) => {
@@ -375,7 +382,7 @@ test('Tailwind theme variables inherit globally and allow instance and dark over
   );
   // A second instance of the same markup proves overrides stay local.
   await example.evaluate((element) => {
-    const other = element.cloneNode(true);
+    const other = element.cloneNode(true) as HTMLElement;
     other.id = 'other-themed-roller';
     other.style.setProperty('--dice-roller-primary', '#0f766e');
     element.after(other);
@@ -388,7 +395,7 @@ test('Tailwind theme variables inherit globally and allow instance and dark over
     'border-left-color',
     'rgb(124, 58, 237)',
   );
-  for (const colorScheme of ['dark', 'light']) {
+  for (const colorScheme of ['dark', 'light'] as const) {
     await page.emulateMedia({ colorScheme });
     await expect(example).toHaveCSS(
       'background-color',
