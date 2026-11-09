@@ -1,46 +1,101 @@
 <script setup>
-import { ref, unref } from 'vue';
+import { computed, ref, unref, watch } from 'vue';
 import { DiceRoll } from '@dice-roller/rpg-dice-roller';
-import { useClipboard } from '@vueuse/core';
+import { useSupported, useTimeoutFn } from '@vueuse/core';
 
-const emit = defineEmits(['notation:change', 'roll']);
-
+const emit = defineEmits(['notation:change', 'update:notation', 'roll']);
 const props = defineProps({
   notation: String,
+  labels: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
-const currentNotation = ref(`${props.notation || ''}`);
+const labels = computed(() => ({
+  notation: 'Notation',
+  copy: 'Copy to clipboard',
+  copied: 'Copied!',
+  copyError: 'Unable to copy to clipboard. Please try again.',
+  invalidNotation: 'Invalid notation',
+  error: 'An error has occurred',
+  ...props.labels,
+}));
+const currentNotation = ref(props.notation ?? '');
 const error = ref(null);
 const output = ref(null);
+const clipboardError = ref(null);
 
-const roll = async () => {
+watch(
+  () => props.notation,
+  (notation) => {
+    currentNotation.value = notation ?? '';
+  }
+);
+
+const roll = () => {
   error.value = null;
-
+  clipboardError.value = null;
   try {
     output.value = currentNotation.value
-      ? new DiceRoll(unref(currentNotation))
+      ? new DiceRoll(currentNotation.value)
       : null;
   } catch (e) {
     output.value = null;
-
-    if (e.name === 'SyntaxError') {
-      error.value = `Invalid notation; ${e.message}`;
-    } else {
-      error.value = `An error has occurred: ${e.message}`;
-    }
+    error.value = `${
+      e.name === 'SyntaxError'
+        ? labels.value.invalidNotation
+        : labels.value.error
+    }: ${e.message}`;
   } finally {
     emit('roll', unref(currentNotation), unref(output));
   }
 };
 
 const setNotation = (notation) => {
+  if (currentNotation.value === notation) return;
   currentNotation.value = notation;
-
+  emit('update:notation', notation);
   emit('notation:change', notation);
 };
 
-const { text, copy, copied, isSupported } = useClipboard({ output });
-const copyOutput = () => copy(`${unref(output)}`);
+const onKeydown = (event) => {
+  if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229)
+    return;
+  event.preventDefault();
+  if (!event.repeat && !event.target?.disabled && currentNotation.value) roll();
+};
+
+const source = computed(() => (output.value ? String(output.value) : ''));
+const text = ref('');
+const copied = ref(false);
+const isSupported = useSupported(
+  () =>
+    typeof navigator !== 'undefined' &&
+    typeof navigator.clipboard?.writeText === 'function'
+);
+const { start: resetCopied, stop: stopResetCopied } = useTimeoutFn(
+  () => {
+    copied.value = false;
+  },
+  1500,
+  { immediate: false }
+);
+const copyOutput = async () => {
+  clipboardError.value = null;
+  copied.value = false;
+  stopResetCopied();
+  if (!output.value) return;
+  const value = source.value;
+  try {
+    await navigator.clipboard.writeText(value);
+    text.value = value;
+    copied.value = true;
+    resetCopied();
+  } catch {
+    clipboardError.value = labels.value.copyError;
+  }
+};
 </script>
 
 <template>
@@ -49,17 +104,19 @@ const copyOutput = () => copy(`${unref(output)}`);
     :error="error"
     :output="output"
     :roll="roll"
+    :labels="labels"
     :bind="{ value: currentNotation }"
     :on="{
       input: (event) => setNotation(event.target.value),
       change: (event) => setNotation(event.target.value),
-      keyup: (event) => (event.keyCode === 13 ? roll() : undefined),
+      keydown: onKeydown,
     }"
     :copy="{
       copy: copyOutput,
       copied,
       text,
       isSupported,
+      error: clipboardError,
     }"
   />
 </template>

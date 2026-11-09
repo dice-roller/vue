@@ -18,6 +18,46 @@ npm install @dice-roller/vue
 
 ### Components
 
+### Shared behaviour
+
+All components accept reactive `notation` updates and support `v-model:notation`. The `notation:change` event is emitted for user edits. The `roll` event receives both the notation and the roll result (or `null` for an unsuccessful roll).
+
+```vue
+<script setup>
+import { ref } from "vue";
+import { DiceRoller } from "@dice-roller/vue";
+
+const notation = ref("4d6");
+</script>
+
+<template>
+  <DiceRoller
+    v-model:notation="notation"
+    class="my-dice-roller"
+    :input-attrs="{ 'aria-describedby': 'notation-help', autocomplete: 'off' }"
+    :labels="{ notation: 'Dice expression', copy: 'Copy result' }"
+  />
+  <p id="notation-help">Enter a dice expression, such as 4d6.</p>
+</template>
+```
+
+For the three HTML components, ordinary attributes such as `class`, `style`, and `data-*` are applied to the outer container. Use the `input-attrs` object for input attributes such as `aria-label`, `aria-describedby`, `autocomplete`, and `disabled`. The component manages the input's ID, value, type, name, and validation attributes; existing `aria-describedby` references are preserved alongside the error description.
+
+Enter rolls the current notation without submitting a surrounding form. Repeated key presses and Enter during IME composition do not roll. Copy controls are also safe to use inside forms. Inputs are linked to validation messages, and roll results, errors, and copy status are announced to assistive technology. Custom styles and themes should retain visible keyboard focus and sufficient colour contrast.
+
+The optional `labels` object is available on all four components. Each key can be overridden independently:
+
+| Key               | Default                                          | Purpose                                  |
+| ----------------- | ------------------------------------------------ | ---------------------------------------- |
+| `notation`        | `Notation`                                       | Input label                              |
+| `copy`            | `Copy to clipboard`                              | Copy button label and title              |
+| `copied`          | `Copied!`                                        | Successful copy announcement             |
+| `copyError`       | `Unable to copy to clipboard. Please try again.` | Failed copy message                      |
+| `invalidNotation` | `Invalid notation`                               | Prefix before the parser's error message |
+| `error`           | `An error has occurred`                          | Prefix before other roll error messages  |
+
+The existing `btn-label` prop and `button` slot customise the roll button. Copy controls are provided by the plain and Tailwind components. The renderless component exposes the resolved `labels` and any clipboard failure as `copy.error` through its default slot, so custom interfaces can display and announce these themselves.
+
 ### Tailwind
 
 If you're using [Tailwind](https://tailwindcss.com/) v3, you can use the pre-styled Tailwind component:
@@ -218,4 +258,10 @@ npm run build
 
 ```sh
 npm run lint
+```
+
+#### Tests
+
+```sh
+npm test
 ```
