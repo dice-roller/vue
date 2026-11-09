@@ -33,6 +33,7 @@ const borderVariants = [...variants, ...['white']];
 
 <script setup>
 import { computed } from 'vue';
+import { ClipboardIcon } from '@heroicons/vue/24/outline';
 import { visuallyHiddenStyle } from '../accessibility.js';
 import DiceRollerRenderless from './DiceRollerRenderless.vue';
 import { useIdGenerator } from '../composables/idGenerator.js';
@@ -139,7 +140,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
   <DiceRollerRenderless
     :notation="notation"
     :labels="labels"
-    v-slot="{ error, output, roll, on, bind, labels: messages }"
+    v-slot="{ error, output, roll, on, bind, copy, labels: messages }"
     @notation:change="$emit('notation:change', $event)"
     @roll="(...args) => $emit('roll', ...args)"
     @update:notation="$emit('update:notation', $event)"
@@ -158,11 +159,40 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
           name="output"
           aria-live="off"
           :for="inputId"
-          class="d-block mb-4 p-3 fs-4 rounded border"
+          class="d-flex align-items-center justify-content-between gap-3 mb-4 p-3 fs-4 rounded border"
           :class="outputClass"
         >
-          {{ output }}
+          <span class="flex-grow-1 text-break">{{ output }}</span>
+          <button
+            v-if="copy.isSupported"
+            type="button"
+            :title="messages.copy"
+            :aria-label="messages.copy"
+            class="btn btn-link link-body-emphasis text-decoration-none p-2 d-inline-flex align-items-center flex-shrink-0 position-relative"
+            @click="copy.copy()"
+          >
+            <!-- Functional icons forward CSS sizing, not width/height attributes. -->
+            <ClipboardIcon
+              class="flex-shrink-0"
+              style="width: 1.5rem; height: 1.5rem"
+              aria-hidden="true"
+            />
+            <span
+              v-if="copy.copied"
+              aria-hidden="true"
+              class="position-absolute top-50 end-100 translate-middle-y me-2 badge text-bg-dark fs-6 fw-normal text-nowrap shadow pe-none"
+              >{{ messages.copied }}</span
+            >
+          </button>
         </output>
+        <span
+          role="status"
+          aria-live="polite"
+          :class="
+            copy.error ? 'd-block mt-2 invalid-feedback' : 'visually-hidden'
+          "
+          >{{ copy.error || (copy.copied ? messages.copied : '') }}</span
+        >
 
         <label :for="inputId" class="form-label visually-hidden">
           {{ messages.notation }}

@@ -56,7 +56,7 @@ The optional `labels` object is available on all four components. Each key can b
 | `invalidNotation` | `Invalid notation`                               | Prefix before the parser's error message |
 | `error`           | `An error has occurred`                          | Prefix before other roll error messages  |
 
-The existing `btn-label` prop and `button` slot customise the roll button. Copy controls are provided by the plain and Tailwind components. The renderless component exposes the resolved `labels` and any clipboard failure as `copy.error` through its default slot, so custom interfaces can display and announce these themselves.
+The existing `btn-label` prop and `button` slot customise the roll button. Copy controls are provided by all three HTML components. The renderless component exposes the resolved `labels` and any clipboard failure as `copy.error` through its default slot, so custom interfaces can display and announce these themselves.
 
 ### Tailwind
 
