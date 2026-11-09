@@ -103,3 +103,47 @@ test('Tailwind roll button keeps its label and padding at different widths', asy
     }
   }
 });
+
+test('Bootstrap follows system theme changes for its card, controls and feedback', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+  const preview = page.locator('.bootstrap-preview');
+  const card = preview.locator('.card');
+  const input = preview.locator('input');
+  const button = preview.getByRole('button', { name: 'Roll', exact: true });
+  await expect(preview).toHaveAttribute('data-bs-theme', 'light');
+  await expect(card).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(input).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await input.fill('1d1');
+  await button.click();
+
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await expect(preview).toHaveAttribute('data-bs-theme', 'dark');
+  await expect(preview).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(card).toHaveCSS('background-color', 'rgb(33, 37, 41)');
+  await expect(input).toHaveCSS('background-color', 'rgb(33, 37, 41)');
+  await expect(preview.locator('output')).toHaveCSS(
+    'color',
+    'rgb(222, 226, 230)',
+  );
+  await expect(preview.locator('output')).toHaveCSS(
+    'border-top-color',
+    'rgb(73, 80, 87)',
+  );
+  await expect(page.locator('.tailwind-preview[data-bs-theme]')).toHaveCount(0);
+  await expect(page.locator('html')).not.toHaveAttribute('data-bs-theme');
+
+  await input.fill('invalid notation');
+  await button.click();
+  await expect(preview.getByRole('alert')).toHaveCSS(
+    'color',
+    'rgb(234, 134, 143)',
+  );
+
+  await page.emulateMedia({ colorScheme: 'light' });
+  await expect(preview).toHaveAttribute('data-bs-theme', 'light');
+  await expect(card).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(input).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+});

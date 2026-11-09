@@ -111,6 +111,14 @@ import { DiceRollerBootstrap } from '@dice-roller/vue';
 
 The Bootstrap component is wrapped in a [card](https://getbootstrap.com/docs/5.2/components/card/), and uses other bootstrap components. It can be easily styled.
 
+With Bootstrap 5.3+, the component inherits the colour mode of its containing page or element. Set `data-bs-theme="dark"` or `data-bs-theme="light"` on an ancestor, or directly on the component:
+
+```vue
+<DiceRollerBootstrap data-bs-theme="dark" />
+```
+
+The playground's Bootstrap preview follows the system colour preference and updates when it changes. Applications can control their own Bootstrap theme independently.
+
 #### Component reference
 
 ##### Properties
