@@ -1,63 +1,26 @@
 <p align="center">
-    <img src="https://dice-roller.github.io/documentation/dice-roller-logo.png" alt="RPG Dice Roller" style="max-width: 100%;" width="200"/>
+  <img src="https://dice-roller.github.io/documentation/dice-roller-logo.png" alt="RPG Dice Roller" width="200"/>
 </p>
 
 # RPG Dice Roller Vue Components
 
-Vue.js component which allows rolling dice.
+Vue components and a composable for rolling dice with [RPG Dice Roller](https://github.com/dice-roller/rpg-dice-roller). Use the Tailwind or Bootstrap component, style the plain HTML component yourself, or build your own interface with the composable or renderless component.
 
-It is built upon this [RPG dice roller](https://github.com/dice-roller/rpg-dice-roller), and is used in the [documentation](https://dice-roller.github.io/documentation/).
+See the [dice roller documentation](https://dice-roller.github.io/documentation/) for supported notation.
 
-## Get started
+## Installation
 
-### Install
+Requires Vue 3.5 or newer within Vue 3.
 
 ```sh
 npm install @dice-roller/vue
 ```
 
-### Package builds and dependency sharing
+Vue and `@dice-roller/rpg-dice-roller` are required peer dependencies. npm installs required peers automatically; with other package managers, ensure compatible versions are installed in your application.
 
-The package provides ESM and CommonJS builds through the same public imports. Import only the components or composable you need; ESM bundlers can remove unused components and icons:
+## Quick start
 
-```js
-import { useDiceRoller } from '@dice-roller/vue';
-// Or: import { DiceRollerTailwind } from '@dice-roller/vue';
-```
-
-For direct browser script usage, `dist/vue.umd.cjs` expects the globals `Vue` and `rpgDiceRoller`. Load Vue and the dice roller library's UMD build (including its own required dependencies) before this file. Its exported global remains `DiceRollerVue`.
-
-### TypeScript
-
-Type declarations are included for both ESM and CommonJS imports, covering component props, events, slots and the composable. JavaScript usage is unchanged; no separate types package is required.
-
-```vue
-<script setup lang="ts">
-import { useDiceRoller } from '@dice-roller/vue';
-import type { DiceRollerLabels } from '@dice-roller/vue';
-
-const labels: Partial<DiceRollerLabels> = { copy: 'Copy result' };
-const { currentNotation, output, roll } = useDiceRoller({
-  notation: '4d6',
-  labels,
-});
-// currentNotation is a writable string ref; output is DiceRoll | null.
-</script>
-
-<template>
-  <input v-model="currentNotation" />
-  <button type="button" @click="roll">Roll</button>
-  <output>{{ output?.total }}</output>
-</template>
-```
-
-The current v5 dice roller library has errors in its own declarations. TypeScript applications checking dependency declarations may need `skipLibCheck: true`; this project's source and consumer API examples are still checked in strict mode.
-
-### Components
-
-### Shared behaviour
-
-All components accept reactive `notation` updates and support `v-model:notation`. The `notation:change` event is emitted for user edits. The `roll` event receives both the notation and the roll result (or `null` for an unsuccessful roll).
+This example uses the plain HTML component, which has no framework styles:
 
 ```vue
 <script setup>
@@ -65,39 +28,48 @@ import { ref } from 'vue';
 import { DiceRoller } from '@dice-roller/vue';
 
 const notation = ref('4d6');
+
+function onRoll(expression, result) {
+  if (result) console.log(expression, result.total);
+}
 </script>
 
 <template>
-  <DiceRoller
-    v-model:notation="notation"
-    class="my-dice-roller"
-    :input-attrs="{ 'aria-describedby': 'notation-help', autocomplete: 'off' }"
-    :labels="{ notation: 'Dice expression', copy: 'Copy result' }"
-  />
-  <p id="notation-help">Enter a dice expression, such as 4d6.</p>
+  <DiceRoller v-model:notation="notation" @roll="onRoll" />
 </template>
 ```
 
-For the three HTML components, ordinary attributes such as `class`, `style`, and `data-*` are applied to the outer container. Use the `input-attrs` object for input attributes such as `aria-label`, `aria-describedby`, `autocomplete`, and `disabled`. The component manages the input's ID, value, type, name, and validation attributes; existing `aria-describedby` references are preserved alongside the error description.
+Changing `notation` updates the input; it does not roll automatically. The user can roll with the button or Enter. The HTML components display results, validation errors and a copy button when clipboard support is available.
 
-Enter rolls the current notation without submitting a surrounding form. Repeated key presses and Enter during IME composition do not roll. Copy controls are also safe to use inside forms. Inputs are linked to validation messages, and roll results, errors, and copy status are announced to assistive technology. Custom styles and themes should retain visible keyboard focus and sufficient colour contrast.
+| Export                 | Use                                                    |
+| ---------------------- | ------------------------------------------------------ |
+| `DiceRoller`           | Plain HTML with CSS classes for your own styles        |
+| `DiceRollerTailwind`   | Pre-styled with Tailwind CSS 3                         |
+| `DiceRollerBootstrap`  | Styled with Bootstrap 5                                |
+| `useDiceRoller`        | Rolling and clipboard logic for your own Vue interface |
+| `DiceRollerRenderless` | The same logic exposed through a scoped slot           |
 
-The optional `labels` object is available on all four components. Each key can be overridden independently:
+## Tailwind
 
-| Key               | Default                                          | Purpose                                  |
-| ----------------- | ------------------------------------------------ | ---------------------------------------- |
-| `notation`        | `Notation`                                       | Input label                              |
-| `copy`            | `Copy to clipboard`                              | Copy button label and title              |
-| `copied`          | `Copied!`                                        | Successful copy announcement             |
-| `copyError`       | `Unable to copy to clipboard. Please try again.` | Failed copy message                      |
-| `invalidNotation` | `Invalid notation`                               | Prefix before the parser's error message |
-| `error`           | `An error has occurred`                          | Prefix before other roll error messages  |
+Configure [Tailwind CSS 3](https://v3.tailwindcss.com/docs/installation) in your application, and include this package in its content paths:
 
-The existing `btn-label` prop and `button` slot customise the roll button. Copy controls are provided by all three HTML components. The renderless component exposes the resolved `labels` and any clipboard failure as `copy.error` through its default slot, so custom interfaces can display and announce these themselves.
+```js
+// tailwind.config.js — add to your existing content paths
+export default {
+  content: [
+    './src/**/*.{vue,js,ts}',
+    './node_modules/@dice-roller/vue/dist/*.js',
+  ],
+};
+```
 
-### Tailwind
+Your Tailwind stylesheet should include the usual directives:
 
-If you're using [Tailwind](https://tailwindcss.com/) v3, you can use the pre-styled Tailwind component:
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
 
 ```vue
 <script setup>
@@ -105,54 +77,35 @@ import { DiceRollerTailwind } from '@dice-roller/vue';
 </script>
 
 <template>
-  <DiceRollerTailwind />
+  <DiceRollerTailwind notation="4d6" />
 </template>
 ```
 
-#### Customising colours
+The component's dark styles follow your Tailwind `darkMode` configuration.
 
-The Tailwind component uses CSS custom properties for its colours. Its defaults include a pastel button gradient, light surfaces in light mode, and deep slate input and result surfaces in dark mode. No additional stylesheet or theme prop is needed.
+### Customising colours
 
-Set variables in your global CSS to theme every instance:
+Set CSS variables globally, on an ancestor, or directly on an instance:
 
 ```css
-:root {
+.my-dice-theme {
   --dice-roller-primary: #7c3aed;
   --dice-roller-primary-hover: #6d28d9;
   --dice-roller-on-primary: #fff;
 }
 ```
 
-`primary` colours the button, output accent and input/button focus border and ring. Setting it makes both button gradient stops the same colour, producing a solid button. `primary-hover` applies on hover and focus; if omitted, these use `primary` too. Keyboard focus outlines remain independently customisable.
-
-Variables also inherit from a containing element, or can be set on one component using its `class` or `style`:
-
 ```vue
-<DiceRollerTailwind
-  style="--dice-roller-primary: #0369a1; --dice-roller-primary-hover: #075985; --dice-roller-on-primary: #fff"
-/>
+<DiceRollerTailwind class="my-dice-theme" notation="4d6" />
 ```
 
-To keep a gradient, override the individual stops instead:
+`primary` sets both button gradient stops, producing a solid button, and colours the result accent and input/button focus border and ring. `primary-hover` applies on hover and focus; it falls back to `primary`. Set `button-from`, `button-to`, `button-hover-from` and `button-hover-to` to customise the gradient instead.
 
-```css
-.my-dice-theme {
-  --dice-roller-button-from: #c4b5fd;
-  --dice-roller-button-to: #bae6fd;
-  --dice-roller-button-hover-from: #a78bfa;
-  --dice-roller-button-hover-to: #7dd3fc;
-}
-```
-
-```vue
-<DiceRollerTailwind class="my-dice-theme" />
-```
-
-All names below have the prefix `--dice-roller-`. Colours accept normal CSS colour values, including your own `var(...)` references or Tailwind's `theme(...)` function in CSS processed by Tailwind.
+All variable names below start with `--dice-roller-`. Where a dark default is listed, a corresponding `-dark` variable is available, such as `--dice-roller-input-surface-dark`. In dark mode, the dark variable takes precedence, followed by the base variable, then the dark default. Without overrides, the component uses the colours below.
 
 | Variable                  | Default / fallback                              | Purpose                                               |
 | ------------------------- | ----------------------------------------------- | ----------------------------------------------------- |
-| `primary`                 | Existing colours below                          | Shared button, output accent and focus colour         |
+| `primary`                 | Unset; uses the colours below                   | Shared button, output accent and focus colour         |
 | `primary-hover`           | `primary`, then existing hover colours          | Button hover/focus colour                             |
 | `on-primary`              | `#111827`; `#1f2937` on hover/focus             | Button text                                           |
 | `surface`                 | `#f1f5f9` / dark `#4b5563`                      | Outer background                                      |
@@ -178,142 +131,128 @@ All names below have the prefix `--dice-roller-`. Colours accept normal CSS colo
 | `copy-surface`            | `#111827`                                       | Copied confirmation background                        |
 | `copy-text`               | `#fff`                                          | Copied confirmation text                              |
 
-Where the table lists a distinct dark default, a corresponding `-dark` variable is available (for example, `--dice-roller-surface-dark`). In dark mode this takes precedence over the base variable, followed by the existing dark default. A base override therefore applies in both modes unless a `-dark` override is supplied.
+## Bootstrap
 
-Dark mode still follows your application's Tailwind v3 `darkMode` configuration. You can also override any base variables within your application's own dark theme selector. The component does not switch themes itself.
+Include Bootstrap's CSS in your application. If it is not already installed:
 
-Make sure Tailwind scans the installed library so it generates the component's utility classes, including its variable-based colours:
-
-```js
-// tailwind.config.js (merge with your existing content paths)
-export default {
-  content: [
-    './src/**/*.{vue,js,ts}',
-    './node_modules/@dice-roller/vue/dist/*.js',
-  ],
-};
+```sh
+npm install bootstrap
 ```
-
-#### Component reference
-
-##### Properties
-
-| Property    | Type     | Default  | Description                             |
-| ----------- | -------- | -------- | --------------------------------------- |
-| `btn-label` | `String` | `"Roll"` | Text content to place in the button     |
-| `id`        | `String` |          | The `id` attribute of the component     |
-| `notation`  | `String` |          | Notation string to set on the component |
-
-##### Slots
-
-| Name     | Description                    |
-| -------- | ------------------------------ |
-| `button` | Content to place in the button |
-
-##### Events
-
-| Event             | Arguments                                                                        | Description                                                                           |
-| ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `notation:change` | `notation` - Current value of the notation input                                 | Change event triggered by the user interaction. Emitted after the notation is changed |
-| `roll`            | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made                                                          |
-
-### Bootstrap
-
-If you're using [Bootstrap](https://getbootstrap.com/) v5, you can use the Bootstrap component:
 
 ```vue
 <script setup>
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { DiceRollerBootstrap } from '@dice-roller/vue';
 </script>
 
 <template>
-  <DiceRollerBootstrap />
+  <DiceRollerBootstrap notation="4d6" btn-variant="primary" />
 </template>
 ```
 
-The Bootstrap component is wrapped in a [card](https://getbootstrap.com/docs/5.2/components/card/), and uses other bootstrap components. It can be easily styled.
-
-With Bootstrap 5.3+, the component inherits the colour mode of its containing page or element. Set `data-bs-theme="dark"` or `data-bs-theme="light"` on an ancestor, or directly on the component:
+The component uses Bootstrap's card, form and button styles. Bootstrap JavaScript is not required. It inherits Bootstrap's theme colours; where Bootstrap colour modes are available, set `data-bs-theme` on the component or an ancestor:
 
 ```vue
-<DiceRollerBootstrap data-bs-theme="dark" />
+<DiceRollerBootstrap data-bs-theme="dark" notation="4d6" />
 ```
 
-The playground's Bootstrap preview follows the system colour preference and updates when it changes. Applications can control their own Bootstrap theme independently.
+### Bootstrap props
 
-#### Component reference
+These are additional to the shared component props below. Only `btn-variant` has a default (`primary`); other variants are unset by default.
 
-##### Properties
+| Prop                                      | Purpose                                                         | Accepted values                                                   |
+| ----------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `variant`, `output-variant`               | Combined background and contrasting text for the card or result | Theme variants                                                    |
+| `bg-variant`, `output-bg-variant`         | Card or result background                                       | Theme variants, `body`, `white`, `transparent`                    |
+| `text-variant`, `output-text-variant`     | Card or result text                                             | Theme variants, `body`, `muted`, `white`, `black-50`, `white-50`  |
+| `border-variant`, `output-border-variant` | Card or result border                                           | Theme variants, `white`                                           |
+| `btn-variant`                             | Roll button style                                               | Theme variants, `outline-` followed by a theme variant, or `link` |
 
-| Property                | Type     | Default     | Description                                                                                                                                                                                                                           |
-| ----------------------- | -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bg-variant`            | `String` |             | Applies one of the Bootstrap theme colour variants to the background                                                                                                                                                                  |
-| `border-variant`        | `String` |             | Applies one of the Bootstrap theme colour variants to the border                                                                                                                                                                      |
-| `btn-label`             | `String` | `"Roll"`    | Text content to place in the button                                                                                                                                                                                                   |
-| `btn-variant`           | `String` | `"primary"` | Applies one of the Bootstrap theme colour variants to the button                                                                                                                                                                      |
-| `id`                    | `String` |             | The `id` attribute of the component                                                                                                                                                                                                   |
-| `notation`              | `String` |             | Notation string to set on the component                                                                                                                                                                                               |
-| `output-bg-variant`     | `String` |             | Applies one of the Bootstrap theme colour variants to the background of the output container                                                                                                                                          |
-| `output-border-variant` | `String` |             | Applies one of the Bootstrap theme colour variants to the border of the output container                                                                                                                                              |
-| `output-text-variant`   | `String` |             | Applies one of the Bootstrap theme colour variants to the text of the output container                                                                                                                                                |
-| `output-variant`        | `String` |             | Applies one of the Bootstrap theme colour variants to the output container. This defines the background colour and contrasting text. See Bootstrap [Color & background](https://getbootstrap.com/docs/5.2/helpers/color-background/). |
-| `text-variant`          | `String` |             | Applies one of the Bootstrap theme colour variants to the text                                                                                                                                                                        |
-| `variant`               | `String` |             | Applies one of the Bootstrap theme colour variants to the component. This defines the background colour and contrasting text. See Bootstrap [Color & background](https://getbootstrap.com/docs/5.2/helpers/color-background/).        |
+Theme variants are `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `light` and `dark`.
 
-##### Slots
+## Plain HTML styling
 
-| Name     | Description                    |
-| -------- | ------------------------------ |
-| `button` | Content to place in the button |
-
-##### Events
-
-| Event             | Arguments                                                                        | Description                                                                           |
-| ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `notation:change` | `notation` - Current value of the notation input                                 | Change event triggered by the user interaction. Emitted after the notation is changed |
-| `roll`            | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made                                                          |
-
-### Plain HTML
-
-There's also a basic component, which provides HTML markup, without any styling. It applies a class to the elements, so you can style it with your own CSS.
+`DiceRoller` uses `dice-roller` as its root class and as the prefix for its element classes. Set `class-name` to change both:
 
 ```vue
-<script setup>
-import { DiceRoller } from '@dice-roller/vue';
-</script>
-
-<template>
-  <DiceRoller />
-</template>
+<DiceRoller class-name="my-roller" notation="4d6" />
 ```
 
-#### Component reference
+For the default prefix, the element classes are:
 
-##### Properties
+- `dice-roller-input-group`, `dice-roller-label`, `dice-roller-input`, `dice-roller-input-invalid`
+- `dice-roller-button`, `dice-roller-output`, `dice-roller-error`
+- `dice-roller-copy-button`, `dice-roller-copy-icon`, `dice-roller-copy-label`, `dice-roller-copy-label-success`, `dice-roller-copy-status`
 
-| Property     | Type     | Default         | Description                             |
-| ------------ | -------- | --------------- | --------------------------------------- |
-| `btn-label`  | `String` | `"Roll"`        | Text content to place in the button     |
-| `class-name` | `String` | `"dice-roller"` | The class name of the component         |
-| `id`         | `String` |                 | The `id` attribute of the component     |
-| `notation`   | `String` |                 | Notation string to set on the component |
+Provide your own CSS, including copy-icon sizing and visible keyboard focus. Use global styles or Vue's `:deep()` selectors when styling the component's children from a parent with scoped styles.
 
-##### Slots
+## Component API
 
-| Name     | Description                    |
-| -------- | ------------------------------ |
-| `button` | Content to place in the button |
+### Props
 
-##### Events
+These props apply to the three HTML components. The renderless component accepts only `notation` and `labels`.
 
-| Event             | Arguments                                                                        | Description                                                                           |
-| ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `notation:change` | `notation` - Current value of the notation input                                 | Change event triggered by the user interaction. Emitted after the notation is changed |
-| `roll`            | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made                                                          |
+| Prop          | Type                        | Default              | Description                                                           |
+| ------------- | --------------------------- | -------------------- | --------------------------------------------------------------------- |
+| `notation`    | `string`                    | Empty input          | Reactive notation source. Use `v-model:notation` for two-way binding. |
+| `labels`      | `Partial<DiceRollerLabels>` | Default labels below | Overrides individual interface and error messages.                    |
+| `btn-label`   | `string`                    | `Roll`               | Roll button text.                                                     |
+| `id`          | `string`                    | Unset                | Container ID. The input receives its own generated ID.                |
+| `input-attrs` | `DiceRollerInputAttrs`      | `{}`                 | Attributes passed to the notation input.                              |
+| `class-name`  | `string`                    | `dice-roller`        | Root class and element-class prefix; `DiceRoller` only.               |
 
-### Composable
+Ordinary attributes such as `class`, `style` and `data-*` are applied to the outer container. Pass input attributes separately:
 
-Use `useDiceRoller()` to build your own interface with the same rolling, validation, labels and clipboard behaviour as the components. Call it synchronously inside `setup()` or `<script setup>`. Each call creates independent state.
+```vue
+<DiceRoller
+  class="my-roller"
+  :input-attrs="{ autocomplete: 'off', 'aria-describedby': 'notation-help' }"
+/>
+<p id="notation-help">Enter a dice expression, such as 4d6.</p>
+```
+
+The component manages the input's `id`, `value`, `type`, `name` and validation attributes. Existing `aria-describedby` references are preserved alongside validation messages. Setting `input-attrs.disabled` disables the input and roll button.
+
+### Events
+
+All four components emit these events:
+
+| Event             | Arguments                                      | Description                                                             |
+| ----------------- | ---------------------------------------------- | ----------------------------------------------------------------------- |
+| `update:notation` | `notation: string`                             | Local notation changed; used by `v-model:notation`.                     |
+| `notation:change` | `notation: string`                             | Local notation changed through user input.                              |
+| `roll`            | `notation: string`, `result: DiceRoll \| null` | A roll was attempted. The result is `null` for an empty or failed roll. |
+
+Parent-driven notation changes do not emit notation-change events. Results are dice roll objects; use `result.total` for the total or `String(result)` for the formatted result.
+
+### Button slot
+
+The HTML components provide a `button` slot to replace the roll button's content:
+
+```vue
+<DiceRoller notation="4d6">
+  <template #button>Roll dice</template>
+</DiceRoller>
+```
+
+### Labels
+
+Pass any of these keys in `labels`; unspecified keys retain their defaults:
+
+| Key               | Default                                          |
+| ----------------- | ------------------------------------------------ |
+| `notation`        | `Notation`                                       |
+| `copy`            | `Copy to clipboard`                              |
+| `copied`          | `Copied!`                                        |
+| `copyError`       | `Unable to copy to clipboard. Please try again.` |
+| `invalidNotation` | `Invalid notation`                               |
+| `error`           | `An error has occurred`                          |
+
+`invalidNotation` and `error` prefix the underlying error message.
+
+## Composable
+
+Call `useDiceRoller()` synchronously inside `setup()` or `<script setup>`. Each call creates independent state.
 
 ```vue
 <script setup>
@@ -331,7 +270,6 @@ const { bind, on, roll, output, error, labels, copy } = useDiceRoller({
     <label :for="inputId">{{ labels.notation }}</label>
     <input
       :id="inputId"
-      type="text"
       v-bind="bind"
       v-on="on"
       :aria-invalid="error ? 'true' : undefined"
@@ -354,18 +292,16 @@ const { bind, on, roll, output, error, labels, copy } = useDiceRoller({
 </template>
 ```
 
-`bind` and `on` wire up input/change events and form-safe Enter handling, including IME composition and key-repeat guards. Alternatively, bind `v-model="currentNotation"` and `@keydown="on.keydown"` on your input.
+### Options
 
-#### Options
+| Option                       | Description                                                                                                                                                    |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `notation`                   | String, ref or getter supplying the notation; `null` or `undefined` clears it. Defaults to an empty string. Reactive source changes update the local notation. |
+| `labels`                     | Object, ref or getter supplying partial label overrides.                                                                                                       |
+| `onNotationChange(notation)` | Called once per local edit through the input handlers, `setNotation()` or `currentNotation`. Source updates do not call it.                                    |
+| `onRoll(notation, result)`   | Called after each roll attempt, with a dice roll object or `null` for an empty or failed roll.                                                                 |
 
-| Option                       | Description                                                                                                                                            |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `notation`                   | Initial notation. Accepts a string, ref or getter; subsequent reactive source changes update the local notation silently. Defaults to an empty string. |
-| `labels`                     | Partial overrides for the shared labels listed above. Accepts an object, ref or getter.                                                                |
-| `onNotationChange(notation)` | Called once when the local notation changes through `currentNotation`, `setNotation()` or the input handlers. Reactive source updates do not call it.  |
-| `onRoll(notation, result)`   | Called after every roll attempt. `result` is a dice roll object, or `null` for empty or unsuccessful rolls.                                            |
-
-Pass a getter when using a reactive property, rather than passing its current value. A notation ref/getter is an input source: editing the local state does not automatically write back to it. Use `onNotationChange` for two-way synchronisation:
+A notation ref/getter is an input source, not an automatically updated model. Use the callback for two-way synchronisation:
 
 ```js
 import { ref } from 'vue';
@@ -377,37 +313,46 @@ const roller = useDiceRoller({
   onNotationChange: (value) => {
     notation.value = value;
   },
-  onRoll: (expression, result) => {
-    console.log(expression, result);
-  },
 });
-
-// For component props: notation: () => props.notation
 ```
 
-#### Return values
+For component props, pass getters such as `notation: () => props.notation` and `labels: () => props.labels` to retain reactivity.
 
-The return value is a plain object, so it can be destructured without losing reactivity. Refs use `.value` in JavaScript and unwrap automatically as top-level bindings in templates.
+### Return values
 
-| Value                   | Type                  | Description                                                                                                                                                                 |
-| ----------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `currentNotation`       | Writable computed ref | Current editable notation; assigning to it calls `onNotationChange` when the value changes.                                                                                 |
-| `setNotation(notation)` | Function              | Updates the local notation with the same behaviour as `currentNotation`.                                                                                                    |
-| `output`                | Ref                   | Latest dice roll object, or `null` before a roll and after an empty or failed roll.                                                                                         |
-| `error`                 | Ref                   | Localised roll error message, or `null`. Reset at the next roll attempt.                                                                                                    |
-| `roll()`                | Function              | Rolls the current notation and updates `output`/`error`.                                                                                                                    |
-| `labels`                | Computed ref          | Merged default and custom labels.                                                                                                                                           |
-| `bind`                  | Computed ref          | Input attributes: `{ value: currentNotation }`, with the notation unwrapped.                                                                                                |
-| `on`                    | Object                | `input`, `change` and `keydown` event handlers for `v-on`.                                                                                                                  |
-| `copy`                  | Reactive object       | `copy()` writes the latest result to the clipboard; `copied`, `text`, `isSupported` and `error` describe the clipboard state. Successful feedback resets after 1.5 seconds. |
+Destructure the return object in setup. Refs use `.value` in JavaScript and unwrap as top-level bindings in templates.
 
-Keep clipboard state accessed as `copy.copied`, `copy.error`, etc. These properties are already unwrapped; destructuring their primitive values would lose reactivity. The clipboard feedback timer is cleaned up when the calling component unmounts.
+| Value                   | Type                  | Description                                                                   |
+| ----------------------- | --------------------- | ----------------------------------------------------------------------------- |
+| `currentNotation`       | Writable computed ref | Editable notation. Assigning a different value calls `onNotationChange`.      |
+| `setNotation(notation)` | Function              | Updates the local notation.                                                   |
+| `output`                | Ref                   | Latest `DiceRoll`, or `null` before a roll and after an empty or failed roll. |
+| `error`                 | Ref                   | Roll error message or `null`; cleared at the next roll attempt.               |
+| `roll()`                | Function              | Rolls the current notation and updates the result/error state.                |
+| `labels`                | Computed ref          | Resolved interface and error labels.                                          |
+| `bind`                  | Computed ref          | `{ value: string }` input binding.                                            |
+| `on`                    | Object                | `input`, `change` and `keydown` handlers for `v-on`.                          |
+| `copy`                  | Reactive object       | Clipboard methods and state, described below.                                 |
 
-The existing components retain their props, events and slots. The three visual components use the composable directly; `DiceRollerRenderless` remains available as a slot-based wrapper around the same logic.
+Use `v-bind="bind"` and `v-on="on"` together. Alternatively, use `v-model="currentNotation"` with `@keydown="on.keydown"`. Enter rolls without submitting a surrounding form; held-key repeats and Enter during IME composition are ignored.
 
-### Renderless component
+### Clipboard
 
-If you want to write your own HTML markup, you can use the renderless component instead. This provides the logic and functionality, without any markup, so you can build your own.
+The composable and renderless component expose the same `copy` object:
+
+| Member        | Description                                                                       |
+| ------------- | --------------------------------------------------------------------------------- |
+| `copy()`      | Asynchronously copies the latest formatted result; does nothing without a result. |
+| `isSupported` | Whether the browser provides the Clipboard API.                                   |
+| `copied`      | `true` after a successful copy, resetting after 1.5 seconds.                      |
+| `text`        | Last successfully copied text.                                                    |
+| `error`       | Copy error message or `null`.                                                     |
+
+Access state as `copy.copied`, `copy.error`, etc.; these values are already unwrapped. Destructuring those primitive properties loses reactivity. Clipboard access normally requires HTTPS or localhost and browser permission.
+
+## Renderless component
+
+`DiceRollerRenderless` renders only its default slot. It accepts `notation` and `labels`, supports `v-model:notation`, and emits the shared component events.
 
 ```vue
 <script setup>
@@ -416,115 +361,60 @@ import { DiceRollerRenderless } from '@dice-roller/vue';
 
 <template>
   <DiceRollerRenderless
-    v-slot="{ currentNotation, error, output, roll, on, bind }"
+    notation="4d6"
+    v-slot="{ bind, on, roll, output, error }"
   >
     <div>
-      <div v-if="error">{{ error }}</div>
-
-      <input type="text" v-on="on" v-bind="bind" />
-
-      <button type="button" @click="roll">Roll</button>
-
-      <div>
-        <strong>Notation:</strong> <em>{{ currentNotation }}</em>
-      </div>
-
-      <output v-if="output">{{ output }}</output>
+      <label for="custom-notation">Notation</label>
+      <input
+        id="custom-notation"
+        v-bind="bind"
+        v-on="on"
+        :aria-invalid="error ? 'true' : undefined"
+        :aria-describedby="error ? 'custom-error' : undefined"
+      />
+      <button type="button" :disabled="!bind.value" @click="roll">Roll</button>
+      <p v-if="error" id="custom-error" role="alert">{{ error }}</p>
+      <output for="custom-notation" aria-live="polite">{{ output }}</output>
     </div>
   </DiceRollerRenderless>
 </template>
 ```
 
-#### Component reference
+Use unique input and error IDs when rendering multiple instances.
 
-##### Properties
+### Default slot values
 
-| Property   | Type     | Default | Description                             |
-| ---------- | -------- | ------- | --------------------------------------- |
-| `notation` | `String` |         | Notation string to set on the component |
+| Value             | Description                                                                  |
+| ----------------- | ---------------------------------------------------------------------------- |
+| `currentNotation` | Current notation string.                                                     |
+| `bind`            | `{ value: string }` binding for the notation input.                          |
+| `on`              | `input`, `change` and `keydown` event handlers.                              |
+| `roll`            | Function that rolls the current notation.                                    |
+| `output`          | Latest `DiceRoll` object or `null`.                                          |
+| `error`           | Roll error message or `null`.                                                |
+| `labels`          | Resolved interface and error labels.                                         |
+| `copy`            | Clipboard object with `copy()`, `isSupported`, `copied`, `text` and `error`. |
 
-##### Slots
+Slot values are already unwrapped; use them directly in the template.
 
-| Name      | Description              |
-| --------- | ------------------------ |
-| `default` | Content of the component |
+## TypeScript
 
-##### Events
+Declarations for the components, composable, events and slots are included. No separate types package is needed. Public types can be imported from the same entry point:
 
-| Event             | Arguments                                                                        | Description                                                                           |
-| ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `notation:change` | `notation` - Current value of the notation input                                 | Change event triggered by the user interaction. Emitted after the notation is changed |
-| `roll`            | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made                                                          |
+```ts
+import type { DiceRollerLabels, UseDiceRollerOptions } from '@dice-roller/vue';
 
-## Development
-
-### Customise configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-### Project Setup
-
-Use the Node version in `.nvmrc` (Node 24). Development tooling requires Node 22.22.2+, 24.15.0+, or 26+. Install the checkout's dependencies:
-
-```sh
-nvm use
-npm ci
+const labels: Partial<DiceRollerLabels> = { copy: 'Copy result' };
+const options: UseDiceRollerOptions = { notation: '4d6', labels };
 ```
 
-Vue is installed locally for development while remaining a peer dependency for consumers. Tailwind is updated within v3; migration to v4 is a separate change.
+## Other import formats
 
-#### Compile and Hot-Reload for Development
+CommonJS is also supported:
 
-```sh
-npm run dev
+```js
+const { DiceRoller, useDiceRoller } = require('@dice-roller/vue');
 ```
 
-#### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-#### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
-
-#### Type checking and tests
-
-```sh
-npm run typecheck
-npm test
-```
-
-#### Code quality and CI
-
-```sh
-npm run lint
-npm run format:check
-```
-
-`lint` and `format:check` do not modify files. Use `npm run lint:fix` and `npm run format` to apply fixes. CI runs linting, formatting, the build and regression tests on Node 22, 24 and 26. Development Vue is pinned to the minimum supported 3.5.0 so `vue-tsc` generates compatible declarations directly. A separate CI job checks those declarations and runtime behaviour with current compatible Vue. Tests are written in TypeScript; `npm test` checks the source, published ESM/CommonJS declarations and Vue consumer templates before running the behavioural tests. `npm run build` generates JavaScript bundles and declarations together.
-
-### Component playground
-
-`npm run dev` opens the playground. Bootstrap and Tailwind are installed through npm as development dependencies; the playground uses no framework CDN.
-
-Each framework is scoped to its own preview component (`.bootstrap-preview` or `.tailwind-preview`) using PostCSS selector prefixes, including framework resets and document-level defaults. The examples render directly on the page, without iframes. The plain component has no framework styles.
-
-The playground lives in `playground/`, separate from the published library in `src/`:
-
-```sh
-npm run build:playground
-npm run preview
-```
-
-This builds into `playground-dist/`. `npm run build` continues to build only the library into `dist/`; preview styles and Bootstrap are not included in the published package.
-
-Browser tests check style isolation, rolling and narrow layouts in both development and production:
-
-```sh
-npx playwright install chromium
-npm run test:playground
-```
+For direct browser scripts, load Vue and the dice roller library's UMD build and its required dependencies before `dist/vue.umd.cjs`. The Vue component package is available as `DiceRollerVue`; its dependencies must provide the globals `Vue` and `rpgDiceRoller`.
