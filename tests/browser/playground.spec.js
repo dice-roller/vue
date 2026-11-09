@@ -147,3 +147,48 @@ test('Bootstrap follows system theme changes for its card, controls and feedback
   await expect(card).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   await expect(input).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 });
+
+test('Tailwind copy confirmation stays readable on one line left of the icon', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.goto('/');
+  const example = page.locator('.tailwind-preview .dice-roller');
+  await example.locator('input').fill('1d1');
+  await example.getByRole('button', { name: 'Roll', exact: true }).click();
+  const copy = example.getByRole('button', {
+    name: 'Copy to clipboard',
+    exact: true,
+  });
+
+  for (const colorScheme of ['light', 'dark']) {
+    await page.emulateMedia({ colorScheme });
+    await copy.click();
+    const confirmation = copy.getByText('Copied!', { exact: true });
+    await expect(confirmation).toBeVisible();
+    await expect(confirmation).toHaveCSS('color', 'rgb(255, 255, 255)');
+    await expect(confirmation).toHaveCSS('background-color', 'rgb(17, 24, 39)');
+    const text = await confirmation.evaluate((element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      return {
+        lines: range.getClientRects().length,
+        height: range.getBoundingClientRect().height,
+      };
+    });
+    expect(text.lines).toBe(1);
+    const labelBox = await confirmation.boundingBox();
+    const iconBox = await copy.locator('svg').boundingBox();
+    expect(labelBox.x + labelBox.width).toBeLessThanOrEqual(iconBox.x - 4);
+    expect(
+      Math.abs(
+        labelBox.y + labelBox.height / 2 - iconBox.y - iconBox.height / 2,
+      ),
+    ).toBeLessThan(1);
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+      '1d1: [1] = 1',
+    );
+  }
+});

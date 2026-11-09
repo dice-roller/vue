@@ -60,7 +60,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
           type="button"
           :title="messages.copy"
           :aria-label="messages.copy"
-          class="relative group/copy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800"
+          class="relative inline-flex shrink-0 items-center group/copy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800"
           @click="copy.copy()"
         >
           <ClipboardIcon
@@ -69,7 +69,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
 
           <span
             v-if="copy.copied"
-            class="absolute content-center top-1/2 -my-3 h-6 right-full text-sm text-gray-500"
+            class="pointer-events-none absolute right-full top-1/2 z-10 mr-2 -translate-y-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-sm font-medium text-white shadow-md"
           >
             {{ messages.copied }}
           </span>
