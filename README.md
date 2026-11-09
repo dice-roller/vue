@@ -274,6 +274,100 @@ import { DiceRoller } from '@dice-roller/vue';
 | `notation:change` | `notation` - Current value of the notation input                                 | Change event triggered by the user interaction. Emitted after the notation is changed |
 | `roll`            | `notation` - Value of the rolled notation.<br>`value` - The response of the roll | Emitted after a roll is made                                                          |
 
+### Composable
+
+Use `useDiceRoller()` to build your own interface with the same rolling, validation, labels and clipboard behaviour as the components. Call it synchronously inside `setup()` or `<script setup>`. Each call creates independent state.
+
+```vue
+<script setup>
+import { useId } from 'vue';
+import { useDiceRoller } from '@dice-roller/vue';
+
+const inputId = useId();
+const { bind, on, roll, output, error, labels, copy } = useDiceRoller({
+  notation: '4d6',
+});
+</script>
+
+<template>
+  <div>
+    <label :for="inputId">{{ labels.notation }}</label>
+    <input
+      :id="inputId"
+      type="text"
+      v-bind="bind"
+      v-on="on"
+      :aria-invalid="error ? 'true' : undefined"
+      :aria-describedby="error ? `${inputId}-error` : undefined"
+    />
+    <button type="button" :disabled="!bind.value" @click="roll">Roll</button>
+    <p v-if="error" :id="`${inputId}-error`" role="alert">{{ error }}</p>
+    <output :for="inputId" aria-live="polite">{{ output }}</output>
+    <button
+      v-if="copy.isSupported && output"
+      type="button"
+      @click="copy.copy()"
+    >
+      {{ labels.copy }}
+    </button>
+    <span role="status">{{
+      copy.error || (copy.copied ? labels.copied : '')
+    }}</span>
+  </div>
+</template>
+```
+
+`bind` and `on` wire up input/change events and form-safe Enter handling, including IME composition and key-repeat guards. Alternatively, bind `v-model="currentNotation"` and `@keydown="on.keydown"` on your input.
+
+#### Options
+
+| Option                       | Description                                                                                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `notation`                   | Initial notation. Accepts a string, ref or getter; subsequent reactive source changes update the local notation silently. Defaults to an empty string. |
+| `labels`                     | Partial overrides for the shared labels listed above. Accepts an object, ref or getter.                                                                |
+| `onNotationChange(notation)` | Called once when the local notation changes through `currentNotation`, `setNotation()` or the input handlers. Reactive source updates do not call it.  |
+| `onRoll(notation, result)`   | Called after every roll attempt. `result` is a dice roll object, or `null` for empty or unsuccessful rolls.                                            |
+
+Pass a getter when using a reactive property, rather than passing its current value. A notation ref/getter is an input source: editing the local state does not automatically write back to it. Use `onNotationChange` for two-way synchronisation:
+
+```js
+import { ref } from 'vue';
+import { useDiceRoller } from '@dice-roller/vue';
+
+const notation = ref('4d6');
+const roller = useDiceRoller({
+  notation,
+  onNotationChange: (value) => {
+    notation.value = value;
+  },
+  onRoll: (expression, result) => {
+    console.log(expression, result);
+  },
+});
+
+// For component props: notation: () => props.notation
+```
+
+#### Return values
+
+The return value is a plain object, so it can be destructured without losing reactivity. Refs use `.value` in JavaScript and unwrap automatically as top-level bindings in templates.
+
+| Value                   | Type                  | Description                                                                                                                                                                 |
+| ----------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `currentNotation`       | Writable computed ref | Current editable notation; assigning to it calls `onNotationChange` when the value changes.                                                                                 |
+| `setNotation(notation)` | Function              | Updates the local notation with the same behaviour as `currentNotation`.                                                                                                    |
+| `output`                | Ref                   | Latest dice roll object, or `null` before a roll and after an empty or failed roll.                                                                                         |
+| `error`                 | Ref                   | Localised roll error message, or `null`. Reset at the next roll attempt.                                                                                                    |
+| `roll()`                | Function              | Rolls the current notation and updates `output`/`error`.                                                                                                                    |
+| `labels`                | Computed ref          | Merged default and custom labels.                                                                                                                                           |
+| `bind`                  | Computed ref          | Input attributes: `{ value: currentNotation }`, with the notation unwrapped.                                                                                                |
+| `on`                    | Object                | `input`, `change` and `keydown` event handlers for `v-on`.                                                                                                                  |
+| `copy`                  | Reactive object       | `copy()` writes the latest result to the clipboard; `copied`, `text`, `isSupported` and `error` describe the clipboard state. Successful feedback resets after 1.5 seconds. |
+
+Keep clipboard state accessed as `copy.copied`, `copy.error`, etc. These properties are already unwrapped; destructuring their primitive values would lose reactivity. The clipboard feedback timer is cleaned up when the calling component unmounts.
+
+The existing components retain their props, events and slots. The three visual components use the composable directly; `DiceRollerRenderless` remains available as a slot-based wrapper around the same logic.
+
 ### Renderless component
 
 If you want to write your own HTML markup, you can use the renderless component instead. This provides the logic and functionality, without any markup, so you can build your own.

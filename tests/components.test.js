@@ -24,7 +24,8 @@ Object.defineProperty(navigator, 'clipboard', {
   value: { writeText: (value) => writeText(value) },
 });
 document.execCommand = () => false;
-const { createApp, createSSRApp, h, nextTick, reactive } = await import('vue');
+const { createApp, createSSRApp, h, nextTick, reactive, ref } =
+  await import('vue');
 const { renderToString } = await import('vue/server-renderer');
 const library = await import('../dist/vue.js');
 const components = ['DiceRoller', 'DiceRollerTailwind', 'DiceRollerBootstrap'];
@@ -292,6 +293,179 @@ test('renderless component supports v-model:notation without feedback loops', as
     await settle();
     assert.equal(input.value, '3d1');
     assert.equal(updates, 1);
+  } finally {
+    app.unmount();
+    host.remove();
+  }
+});
+
+function mountRollers(...options) {
+  const host = document.createElement('div');
+  document.body.append(host);
+  let rollers;
+  const app = createApp({
+    setup() {
+      rollers = options.map((option) => library.useDiceRoller(option));
+      return () => h('div');
+    },
+  });
+  app.mount(host);
+  return {
+    rollers,
+    close() {
+      app.unmount();
+      host.remove();
+    },
+  };
+}
+
+test('composable accepts refs/getters and local v-model edits without source feedback loops', async () => {
+  const notation = ref('1d1');
+  const props = reactive({
+    notation: '2d1',
+    labels: { invalidNotation: 'Check dice' },
+  });
+  const changes = [];
+  const f = mountRollers(
+    {
+      notation,
+      onNotationChange: (value) => {
+        changes.push(value);
+        notation.value = value;
+      },
+    },
+    { notation: () => props.notation, labels: () => props.labels },
+  );
+  try {
+    const [first, second] = f.rollers;
+    first.currentNotation.value = '3d1';
+    first.on.change({ target: { value: '3d1' } });
+    await settle();
+    assert.deepEqual(changes, ['3d1']);
+    assert.equal(notation.value, '3d1');
+    assert.deepEqual(first.bind.value, { value: '3d1' });
+    notation.value = '4d1';
+    props.notation = 'invalid notation';
+    props.labels = { invalidNotation: 'Updated label' };
+    await settle();
+    assert.equal(first.currentNotation.value, '4d1');
+    assert.deepEqual(changes, ['3d1']);
+    second.roll();
+    assert.match(second.error.value, /^Updated label:/);
+    assert.equal(second.labels.value.copy, 'Copy to clipboard');
+    assert.equal(first.error.value, null);
+    notation.value = undefined;
+    await settle();
+    assert.equal(first.currentNotation.value, '');
+  } finally {
+    f.close();
+  }
+});
+
+test('composable keeps rolls, validation and clipboard state independent per call', async () => {
+  const rolls = [];
+  const f = mountRollers(
+    { notation: '2d1', onRoll: (...args) => rolls.push(args) },
+    {},
+  );
+  const copied = [];
+  writeText = async (value) => copied.push(value);
+  try {
+    const [first, second] = f.rollers;
+    assert.equal(second.currentNotation.value, '');
+    assert.equal(first.copy.isSupported, true);
+    first.roll();
+    assert.equal(first.output.value.total, 2);
+    assert.equal(rolls[0][0], '2d1');
+    assert.equal(rolls[0][1], first.output.value);
+    assert.equal(second.output.value, null);
+    await first.copy.copy();
+    assert.deepEqual(copied, ['2d1: [1, 1] = 2']);
+    assert.equal(first.copy.copied, true);
+    assert.equal(first.copy.text, copied[0]);
+    assert.equal(second.copy.copied, false);
+    writeText = async () => {
+      throw new Error('Denied');
+    };
+    await first.copy.copy();
+    assert.equal(first.copy.copied, false);
+    assert.equal(first.copy.error, first.labels.value.copyError);
+    assert.equal(second.copy.error, null);
+    first.setNotation('invalid notation');
+    first.roll();
+    assert.equal(first.output.value, null);
+    assert.match(first.error.value, /^Invalid notation:/);
+    assert.equal(first.copy.error, null);
+    assert.equal(rolls[1][1], null);
+    first.setNotation('');
+    first.roll();
+    assert.equal(first.error.value, null);
+    assert.deepEqual(rolls[2], ['', null]);
+    await second.copy.copy();
+    assert.equal(second.copy.error, null);
+  } finally {
+    f.close();
+    writeText = async () => {};
+  }
+});
+
+test('renderless adapter preserves its slot contract and ordered events', async () => {
+  const host = document.createElement('div');
+  document.body.append(host);
+  const events = [];
+  let state;
+  const app = createApp({
+    render: () =>
+      h(
+        library.DiceRollerRenderless,
+        {
+          notation: '1d1',
+          'onUpdate:notation': (value) => events.push(['update', value]),
+          'onNotation:change': (value) => events.push(['change', value]),
+          onRoll: (...args) => events.push(['roll', ...args]),
+        },
+        {
+          default: (slot) => {
+            state = slot;
+            return h('div');
+          },
+        },
+      ),
+  });
+  try {
+    app.mount(host);
+    assert.deepEqual(Object.keys(state).sort(), [
+      'bind',
+      'copy',
+      'currentNotation',
+      'error',
+      'labels',
+      'on',
+      'output',
+      'roll',
+    ]);
+    assert.deepEqual(Object.keys(state.copy).sort(), [
+      'copied',
+      'copy',
+      'error',
+      'isSupported',
+      'text',
+    ]);
+    assert.equal(state.currentNotation, '1d1');
+    state.on.input({ target: { value: '2d1' } });
+    state.on.change({ target: { value: '2d1' } });
+    await settle();
+    assert.equal(state.bind.value, '2d1');
+    assert.deepEqual(events, [
+      ['update', '2d1'],
+      ['change', '2d1'],
+    ]);
+    state.roll();
+    await settle();
+    assert.equal(events[2][0], 'roll');
+    assert.equal(events[2][1], '2d1');
+    assert.equal(events[2][2].total, 2);
+    assert.equal(state.output.total, 2);
   } finally {
     app.unmount();
     host.remove();

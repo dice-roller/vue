@@ -17,7 +17,21 @@ for (const [format, library] of Object.entries(entrypoints)) {
       'DiceRollerBootstrap',
       'DiceRollerRenderless',
       'DiceRollerTailwind',
+      'useDiceRoller',
     ]);
+  });
+
+  test(`${format}: composable works during SSR without browser globals`, async () => {
+    const html = await renderToString(
+      createSSRApp({
+        setup() {
+          const { output, roll } = library.useDiceRoller({ notation: '2d1' });
+          roll();
+          return () => h('output', String(output.value));
+        },
+      }),
+    );
+    assert.equal(html, '<output>2d1: [1, 1] = 2</output>');
   });
 
   test(`${format}: bundled engine handles maths, modifiers and random rolls`, async () => {
