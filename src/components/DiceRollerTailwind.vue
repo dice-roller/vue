@@ -37,7 +37,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
     <div
       v-bind="$attrs"
       :id="id"
-      class="dice-roller p-4 rounded bg-slate-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200"
+      class="dice-roller p-4 rounded bg-[color:var(--dice-roller-surface,#f1f5f9)] dark:bg-[color:var(--dice-roller-surface-dark,var(--dice-roller-surface,#4b5563))] text-[color:var(--dice-roller-text,#1f2937)] dark:text-[color:var(--dice-roller-text-dark,var(--dice-roller-text,#e5e7eb))]"
     >
       <span
         role="status"
@@ -51,7 +51,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
         name="output"
         aria-live="off"
         :for="inputId"
-        class="flex flex-row flex-nowrap justify-between mb-8 p-4 text-2xl rounded bg-white text-black dark:bg-gray-300 dark:text-gray-800 border-l-8 border-[#d4f4c6]"
+        class="flex flex-row flex-nowrap justify-between mb-4 p-4 text-2xl rounded bg-[color:var(--dice-roller-output-surface,#fff)] dark:bg-[color:var(--dice-roller-output-surface-dark,var(--dice-roller-output-surface,#1e293b))] text-[color:var(--dice-roller-output-text,#000)] dark:text-[color:var(--dice-roller-output-text-dark,var(--dice-roller-output-text,#e2e8f0))] border-l-8 border-[color:var(--dice-roller-output-accent,var(--dice-roller-primary,#d4f4c6))] dark:border-[color:var(--dice-roller-output-accent-dark,var(--dice-roller-output-accent,var(--dice-roller-primary,#6b8f63)))]"
       >
         {{ output }}
 
@@ -60,7 +60,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
           type="button"
           :title="messages.copy"
           :aria-label="messages.copy"
-          class="relative inline-flex shrink-0 items-center group/copy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800"
+          class="relative inline-flex shrink-0 items-center group/copy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--dice-roller-focus-outline,#1f2937)] dark:focus-visible:outline-[color:var(--dice-roller-focus-outline-dark,var(--dice-roller-focus-outline,#fff))]"
           @click="copy.copy()"
         >
           <ClipboardIcon
@@ -69,7 +69,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
 
           <span
             v-if="copy.copied"
-            class="pointer-events-none absolute right-full top-1/2 z-10 mr-2 -translate-y-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-sm font-medium text-white shadow-md"
+            class="pointer-events-none absolute right-full top-1/2 z-10 mr-2 -translate-y-1/2 whitespace-nowrap rounded bg-[color:var(--dice-roller-copy-surface,#111827)] px-2 py-1 text-sm font-medium text-[color:var(--dice-roller-copy-text,#fff)] shadow-md"
           >
             {{ messages.copied }}
           </span>
@@ -81,7 +81,9 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
         role="status"
         aria-live="polite"
         :class="
-          copy.error ? 'block mt-2 text-red-700 dark:text-red-200' : 'sr-only'
+          copy.error
+            ? 'block mt-2 text-[color:var(--dice-roller-error,#b91c1c)] dark:text-[color:var(--dice-roller-error-dark,var(--dice-roller-error,#fecaca))]'
+            : 'sr-only'
         "
         >{{ copy.error || (copy.copied ? messages.copied : '') }}</span
       >
@@ -101,18 +103,18 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
           name="notation"
           :id="inputId"
           :placeholder="`e.g. ${notation || '4d6'}`"
-          class="min-w-0 flex-1 block w-full h-11 py-2 px-4 text-base border shadow-sm rounded placeholder-gray-500 focus:ring-[#d4f4c6] focus:border-[#d4f4c6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800 dark:focus-visible:outline-white focus:placeholder-gray-400 dark:focus:placeholder-gray-400 invalid:text-red-700 invalid:border-red-200 invalid:bg-red-50 sm:border-r-0 sm:rounded-r-none"
+          class="min-w-0 flex-1 block w-full h-11 py-2 px-4 text-base border shadow-sm rounded placeholder-[color:var(--dice-roller-input-placeholder,#6b7280)] dark:placeholder-[color:var(--dice-roller-input-placeholder-dark,var(--dice-roller-input-placeholder,#94a3b8))] focus:ring-[color:var(--dice-roller-focus,var(--dice-roller-primary,#d4f4c6))] focus:border-[color:var(--dice-roller-focus,var(--dice-roller-primary,#d4f4c6))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--dice-roller-focus-outline,#1f2937)] dark:focus-visible:outline-[color:var(--dice-roller-focus-outline-dark,var(--dice-roller-focus-outline,#fff))] focus:placeholder-[color:var(--dice-roller-input-placeholder-focus,#9ca3af)] dark:focus:placeholder-[color:var(--dice-roller-input-placeholder-focus-dark,var(--dice-roller-input-placeholder-focus,#94a3b8))] invalid:text-[color:var(--dice-roller-input-error-text,var(--dice-roller-error,#b91c1c))] invalid:border-[color:var(--dice-roller-input-error-border,#fecaca)] invalid:bg-[color:var(--dice-roller-input-error-surface,#fef2f2)] sm:border-r-0 sm:rounded-r-none"
           :class="
             error
-              ? 'text-red-700 border-red-200 bg-red-50'
-              : 'bg-white text-gray-900 border-gray-300 dark:text-gray-600 dark:bg-gray-50 dark:border-gray-700'
+              ? 'text-[color:var(--dice-roller-input-error-text,var(--dice-roller-error,#b91c1c))] border-[color:var(--dice-roller-input-error-border,#fecaca)] bg-[color:var(--dice-roller-input-error-surface,#fef2f2)]'
+              : 'bg-[color:var(--dice-roller-input-surface,#fff)] dark:bg-[color:var(--dice-roller-input-surface-dark,var(--dice-roller-input-surface,#0f172a))] text-[color:var(--dice-roller-input-text,#111827)] dark:text-[color:var(--dice-roller-input-text-dark,var(--dice-roller-input-text,#e2e8f0))] border-[color:var(--dice-roller-border,#d1d5db)] dark:border-[color:var(--dice-roller-border-dark,var(--dice-roller-border,#374151))]'
           "
           v-on="on"
         />
 
         <button
           type="button"
-          class="inline-flex shrink-0 items-center justify-center whitespace-nowrap px-8 h-11 font-bold text-gray-900 bg-gradient-to-br from-[#eda18b] to-[#d4f4c6] border sm:border-l-0 border-gray-300 rounded transition dark:border-gray-700 focus:from-[#e88c71] focus:to-[#bbf0a3] focus:text-gray-800 focus:ring-[#d4f4c6] focus:border-[#d4f4c6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800 dark:focus-visible:outline-white hover:from-[#e88c71] hover:to-[#bbf0a3] hover:text-gray-800 sm:rounded-l-none"
+          class="inline-flex shrink-0 items-center justify-center whitespace-nowrap px-8 h-11 font-bold text-[color:var(--dice-roller-on-primary,#111827)] bg-gradient-to-br from-[color:var(--dice-roller-button-from,var(--dice-roller-primary,#eda18b))] to-[color:var(--dice-roller-button-to,var(--dice-roller-primary,#d4f4c6))] border sm:border-l-0 border-[color:var(--dice-roller-border,#d1d5db)] rounded transition dark:border-[color:var(--dice-roller-border-dark,var(--dice-roller-border,#374151))] focus:from-[color:var(--dice-roller-button-hover-from,var(--dice-roller-primary-hover,var(--dice-roller-primary,#e88c71)))] focus:to-[color:var(--dice-roller-button-hover-to,var(--dice-roller-primary-hover,var(--dice-roller-primary,#bbf0a3)))] focus:text-[color:var(--dice-roller-on-primary,#1f2937)] focus:ring-[color:var(--dice-roller-focus,var(--dice-roller-primary,#d4f4c6))] focus:border-[color:var(--dice-roller-focus,var(--dice-roller-primary,#d4f4c6))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--dice-roller-focus-outline,#1f2937)] dark:focus-visible:outline-[color:var(--dice-roller-focus-outline-dark,var(--dice-roller-focus-outline,#fff))] hover:from-[color:var(--dice-roller-button-hover-from,var(--dice-roller-primary-hover,var(--dice-roller-primary,#e88c71)))] hover:to-[color:var(--dice-roller-button-hover-to,var(--dice-roller-primary-hover,var(--dice-roller-primary,#bbf0a3)))] hover:text-[color:var(--dice-roller-on-primary,#1f2937)] sm:rounded-l-none"
           :disabled="!bind.value || inputAttrs.disabled"
           @click="roll"
         >
@@ -124,7 +126,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
         v-if="error"
         :id="`${inputId}-error`"
         role="alert"
-        class="block mt-4 text-red-700 text-sm dark:text-red-200"
+        class="block mt-4 text-sm text-[color:var(--dice-roller-error,#b91c1c)] dark:text-[color:var(--dice-roller-error-dark,var(--dice-roller-error,#fecaca))]"
       >
         {{ error }}
       </span>

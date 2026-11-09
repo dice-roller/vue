@@ -233,3 +233,187 @@ for (const { name, selector, badgeBackground } of [
     }
   });
 }
+
+for (const colorScheme of ['light', 'dark']) {
+  test(`Tailwind theme defaults preserve the ${colorScheme} palette and interaction colours`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.goto('/');
+    const example = page.locator('.tailwind-preview .dice-roller');
+    const input = example.locator('input');
+    const button = example.getByRole('button', { name: 'Roll', exact: true });
+    const dark = colorScheme === 'dark';
+    await expect(example).toHaveCSS(
+      'background-color',
+      dark ? 'rgb(75, 85, 99)' : 'rgb(241, 245, 249)',
+    );
+    await expect(example).toHaveCSS(
+      'color',
+      dark ? 'rgb(229, 231, 235)' : 'rgb(31, 41, 55)',
+    );
+    await expect(input).toHaveCSS(
+      'background-color',
+      dark ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)',
+    );
+    await expect(input).toHaveCSS(
+      'color',
+      dark ? 'rgb(226, 232, 240)' : 'rgb(17, 24, 39)',
+    );
+    await expect(input).toHaveCSS(
+      'border-top-color',
+      dark ? 'rgb(55, 65, 81)' : 'rgb(209, 213, 219)',
+    );
+    await expect(button).toHaveCSS('color', 'rgb(17, 24, 39)');
+    await expect(button).toHaveCSS(
+      'background-image',
+      /rgb\(237, 161, 139\).*rgb\(212, 244, 198\)/,
+    );
+    const placeholderColour = () =>
+      input.evaluate(
+        (element) => getComputedStyle(element, '::placeholder').color,
+      );
+    expect(await placeholderColour()).toBe(
+      dark ? 'rgb(148, 163, 184)' : 'rgb(107, 114, 128)',
+    );
+    await input.focus();
+    expect(await placeholderColour()).toBe(
+      dark ? 'rgb(148, 163, 184)' : 'rgb(156, 163, 175)',
+    );
+    await button.hover();
+    await expect(button).toHaveCSS(
+      'background-image',
+      /rgb\(232, 140, 113\).*rgb\(187, 240, 163\)/,
+    );
+    await expect(button).toHaveCSS('color', 'rgb(31, 41, 55)');
+    await input.fill('1d1');
+    await expect(input).toHaveCSS('border-top-color', 'rgb(212, 244, 198)');
+    await expect(input).toHaveCSS(
+      'outline-color',
+      dark ? 'rgb(255, 255, 255)' : 'rgb(31, 41, 55)',
+    );
+    await button.click();
+    const output = example.locator('output');
+    await expect(output).toHaveCSS(
+      'background-color',
+      dark ? 'rgb(30, 41, 59)' : 'rgb(255, 255, 255)',
+    );
+    await expect(output).toHaveCSS(
+      'color',
+      dark ? 'rgb(226, 232, 240)' : 'rgb(0, 0, 0)',
+    );
+    await expect(output).toHaveCSS(
+      'border-left-color',
+      dark ? 'rgb(107, 143, 99)' : 'rgb(212, 244, 198)',
+    );
+    await input.focus();
+    await page.keyboard.press('Shift+Tab');
+    await expect(
+      example.getByRole('button', { name: 'Copy to clipboard', exact: true }),
+    ).toHaveCSS(
+      'outline-color',
+      dark ? 'rgb(255, 255, 255)' : 'rgb(31, 41, 55)',
+    );
+    await input.fill('invalid notation');
+    await button.click();
+    await expect(input).toHaveCSS('background-color', 'rgb(254, 242, 242)');
+    await expect(input).toHaveCSS('color', 'rgb(185, 28, 28)');
+    await expect(input).toHaveCSS('border-top-color', 'rgb(254, 202, 202)');
+    await expect(example.getByRole('alert')).toHaveCSS(
+      'color',
+      dark ? 'rgb(254, 202, 202)' : 'rgb(185, 28, 28)',
+    );
+  });
+}
+
+test('Tailwind theme variables inherit globally and allow instance and dark overrides', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.addStyleTag({
+    content: `
+    :root {
+      --dice-roller-primary: #7c3aed;
+      --dice-roller-primary-hover: #6d28d9;
+      --dice-roller-on-primary: #fff;
+      --dice-roller-surface: #e0e7ff;
+      --dice-roller-surface-dark: #312e81;
+    }
+    .tailwind-preview { --dice-roller-output-text: #0369a1; }
+  `,
+  });
+  const example = page.locator('.tailwind-preview .dice-roller').first();
+  const input = example.locator('input');
+  const button = example.getByRole('button', { name: 'Roll', exact: true });
+  await expect(example).toHaveCSS('background-color', 'rgb(224, 231, 255)');
+  await expect(button).toHaveCSS(
+    'background-image',
+    /rgb\(124, 58, 237\).*rgb\(124, 58, 237\)/,
+  );
+  await expect(button).toHaveCSS('color', 'rgb(255, 255, 255)');
+  await button.hover();
+  await expect(button).toHaveCSS(
+    'background-image',
+    /rgb\(109, 40, 217\).*rgb\(109, 40, 217\)/,
+  );
+  await page.mouse.move(0, 0);
+  await button.focus();
+  await expect(button).toHaveCSS(
+    'background-image',
+    /rgb\(109, 40, 217\).*rgb\(109, 40, 217\)/,
+  );
+  await input.fill('1d1');
+  await expect(input).toHaveCSS('border-top-color', 'rgb(124, 58, 237)');
+  await button.click();
+  await expect(example.locator('output')).toHaveCSS(
+    'border-left-color',
+    'rgb(124, 58, 237)',
+  );
+  await expect(example.locator('output')).toHaveCSS(
+    'color',
+    'rgb(3, 105, 161)',
+  );
+  // A second instance of the same markup proves overrides stay local.
+  await example.evaluate((element) => {
+    const other = element.cloneNode(true);
+    other.id = 'other-themed-roller';
+    other.style.setProperty('--dice-roller-primary', '#0f766e');
+    element.after(other);
+  });
+  await expect(page.locator('#other-themed-roller output')).toHaveCSS(
+    'border-left-color',
+    'rgb(15, 118, 110)',
+  );
+  await expect(example.locator('output')).toHaveCSS(
+    'border-left-color',
+    'rgb(124, 58, 237)',
+  );
+  for (const colorScheme of ['dark', 'light']) {
+    await page.emulateMedia({ colorScheme });
+    await expect(example).toHaveCSS(
+      'background-color',
+      colorScheme === 'dark' ? 'rgb(49, 46, 129)' : 'rgb(224, 231, 255)',
+    );
+    await expect(example.locator('output')).toHaveCSS(
+      'color',
+      'rgb(3, 105, 161)',
+    );
+    await expect(example.locator('output')).toHaveCSS(
+      'border-left-color',
+      'rgb(124, 58, 237)',
+    );
+  }
+  await example.evaluate((element) => {
+    element.style.setProperty('--dice-roller-button-from', '#fda4af');
+    element.style.setProperty('--dice-roller-button-to', '#a5f3fc');
+  });
+  await input.focus();
+  await expect(button).toHaveCSS(
+    'background-image',
+    /rgb\(253, 164, 175\).*rgb\(165, 243, 252\)/,
+  );
+  await expect(page.locator('.bootstrap-preview .card')).toHaveCSS(
+    'background-color',
+    'rgb(255, 255, 255)',
+  );
+});
