@@ -1,0 +1,63 @@
+:root {
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background: #f1f5f9;
+}
+body {
+  margin: 0;
+}
+#app {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+.page-header {
+  margin-bottom: 2rem;
+}
+h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+p {
+  margin: 0.5rem 0 0;
+}
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+.demo-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  background: white;
+}
+.demo-card > header {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+.demo-card h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.demo-card p {
+  color: #475569;
+}
+@media (max-width: 800px) {
+  #app {
+    padding: 1rem;
+  }
+  .demo-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.bootstrap-preview,
+.tailwind-preview,
+.plain-preview {
+  padding: 1rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

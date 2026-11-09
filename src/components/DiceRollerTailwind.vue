@@ -101,7 +101,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
           name="notation"
           :id="inputId"
           :placeholder="`e.g. ${notation || '4d6'}`"
-          class="flex-auto block w-full h-11 py-2 px-4 text-base border shadow-sm rounded placeholder-gray-500 focus:ring-[#d4f4c6] focus:border-[#d4f4c6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800 dark:focus-visible:outline-white focus:placeholder-gray-400 dark:focus:placeholder-gray-400 invalid:text-red-700 invalid:border-red-200 invalid:bg-red-50 sm:border-r-0 sm:rounded-r-none"
+          class="min-w-0 flex-1 block w-full h-11 py-2 px-4 text-base border shadow-sm rounded placeholder-gray-500 focus:ring-[#d4f4c6] focus:border-[#d4f4c6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800 dark:focus-visible:outline-white focus:placeholder-gray-400 dark:focus:placeholder-gray-400 invalid:text-red-700 invalid:border-red-200 invalid:bg-red-50 sm:border-r-0 sm:rounded-r-none"
           :class="
             error
               ? 'text-red-700 border-red-200 bg-red-50'
@@ -112,7 +112,7 @@ const { id: inputId } = useIdGenerator(`${props.id || 'dice-roller'}-`);
 
         <button
           type="button"
-          class="block px-8 h-11 font-bold text-gray-900 bg-gradient-to-br from-[#eda18b] to-[#d4f4c6] border border-l-0 border-gray-300 rounded transition dark:border-gray-700 focus:from-[#e88c71] focus:to-[#bbf0a3] focus:text-gray-800 focus:ring-[#d4f4c6] focus:border-[#d4f4c6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800 dark:focus-visible:outline-white hover:from-[#e88c71] hover:to-[#bbf0a3] hover:text-gray-800 sm:rounded-l-none"
+          class="inline-flex shrink-0 items-center justify-center whitespace-nowrap px-8 h-11 font-bold text-gray-900 bg-gradient-to-br from-[#eda18b] to-[#d4f4c6] border sm:border-l-0 border-gray-300 rounded transition dark:border-gray-700 focus:from-[#e88c71] focus:to-[#bbf0a3] focus:text-gray-800 focus:ring-[#d4f4c6] focus:border-[#d4f4c6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800 dark:focus-visible:outline-white hover:from-[#e88c71] hover:to-[#bbf0a3] hover:text-gray-800 sm:rounded-l-none"
           :disabled="!bind.value || inputAttrs.disabled"
           @click="roll"
         >

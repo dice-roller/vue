@@ -5,11 +5,22 @@ import vue from 'eslint-plugin-vue';
 import globals from 'globals';
 
 export default defineConfig([
-  globalIgnores(['dist/**', 'dist-ssr/**', 'coverage/**']),
+  globalIgnores([
+    'dist/**',
+    'dist-ssr/**',
+    'coverage/**',
+    'playground-dist/**',
+    'test-results/**',
+    'playwright-report/**',
+  ]),
   js.configs.recommended,
   ...vue.configs['flat/essential'],
   {
-    files: ['src/**/*.{js,vue}'],
+    files: [
+      'src/**/*.{js,vue}',
+      'playground/**/*.{js,vue}',
+      'tests/browser/**/*.js',
+    ],
     languageOptions: { globals: globals.browser },
   },
   {
