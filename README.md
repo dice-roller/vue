@@ -10,7 +10,7 @@ See the [dice roller documentation](https://dice-roller.github.io/documentation/
 
 ## Installation
 
-Requires Vue 3.5 or newer within Vue 3.
+Requires Vue 3.5.45 or newer within Vue 3.
 
 ```sh
 npm install @dice-roller/vue
