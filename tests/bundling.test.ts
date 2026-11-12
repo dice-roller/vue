@@ -1,4 +1,4 @@
-import type { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import type { Roll } from '@dice-roller/rpg-dice-roller';
 import assert from 'node:assert/strict';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -80,7 +80,7 @@ test('UMD browser build uses the provided Vue and dice roller library globals', 
     DiceRollerVue?: typeof import('@dice-roller/vue');
   } = { Vue: require('vue'), rpgDiceRoller: dice };
   runInNewContext(await readFile(`${root}dist/vue.umd.cjs`, 'utf8'), context);
-  const captured: { result: DiceRoll | null } = { result: null };
+  const captured: { result: Roll | null } = { result: null };
   await renderToString(
     createSSRApp({
       setup() {
@@ -93,6 +93,7 @@ test('UMD browser build uses the provided Vue and dice roller library globals', 
       },
     }),
   );
-  assert.ok(captured.result instanceof dice.DiceRoll);
+  assert.ok(captured.result instanceof dice.Roll);
   assert.equal(captured.result!.total, 2);
+  assert.equal(captured.result!.reroll().total, 2);
 });

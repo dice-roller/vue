@@ -1,4 +1,4 @@
-import type { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import type { Roll } from '@dice-roller/rpg-dice-roller';
 import type { DiceRollerSlotProps } from '@dice-roller/vue';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
@@ -43,34 +43,28 @@ for (const [format, library] of Object.entries(entrypoints)) {
     assert.equal(html, '<output>2d1: [1, 1] = 2</output>');
   });
 
-  test(`${format}: rolls share the consumer's number-generator configuration`, async () => {
-    const { DiceRoll, NumberGenerator } = diceLibraries[format];
-    const original = NumberGenerator.generator.engine;
-    try {
-      for (const [engine, total] of [
-        [NumberGenerator.engines.min, 2],
-        [NumberGenerator.engines.max, 12],
-      ] as const) {
-        NumberGenerator.generator.engine = engine;
-        const captured: { result: DiceRoll | null } = { result: null };
-        await renderToString(
-          createSSRApp({
-            setup() {
-              const { roll, output } = library.useDiceRoller({
-                notation: '2d6',
-              });
-              roll();
-              captured.result = output.value;
-              return () => h('div');
-            },
-          }),
-        );
-        assert.ok(captured.result instanceof DiceRoll);
-        assert.equal(captured.result!.total, total);
-      }
-    } finally {
-      NumberGenerator.generator.engine = original;
-    }
+  test(`${format}: results use v6 Roll instances and preserve identity`, async () => {
+    const { Roll: RollClass } = diceLibraries[format];
+    const captured: { callback: Roll | null; output: Roll | null } = {
+      callback: null,
+      output: null,
+    };
+    await renderToString(
+      createSSRApp({
+        setup() {
+          const { roll, output } = library.useDiceRoller({
+            notation: '2d1',
+            onRoll: (_notation, result) => (captured.callback = result),
+          });
+          roll();
+          captured.output = output.value;
+          return () => h('div');
+        },
+      }),
+    );
+    assert.ok(captured.output instanceof RollClass);
+    assert.strictEqual(captured.callback, captured.output);
+    assert.equal(captured.output.reroll().total, 2);
   });
 
   test(`${format}: dice roller library handles maths, modifiers and random rolls`, async () => {
@@ -81,7 +75,7 @@ for (const [format, library] of Object.entries(entrypoints)) {
       ['4d6kh3+2', 5, 20],
     ] as const) {
       let roll!: () => void;
-      const captured: { result: DiceRoll | null } = { result: null };
+      const captured: { result: Roll | null } = { result: null };
       await renderToString(
         createSSRApp({
           render: () =>
@@ -89,7 +83,7 @@ for (const [format, library] of Object.entries(entrypoints)) {
               library.DiceRollerRenderless,
               {
                 notation,
-                onRoll: (_: string, value: DiceRoll | null) =>
+                onRoll: (_: string, value: Roll | null) =>
                   (captured.result = value),
               },
               {
@@ -102,7 +96,7 @@ for (const [format, library] of Object.entries(entrypoints)) {
         }),
       );
       await roll();
-      assert.ok(captured.result instanceof diceLibraries[format].DiceRoll);
+      assert.ok(captured.result instanceof diceLibraries[format].Roll);
       assert.ok(captured.result, `Expected a result for ${notation}`);
       assert.ok(
         captured.result!.total >= min && captured.result!.total <= max,

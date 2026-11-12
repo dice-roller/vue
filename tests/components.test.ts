@@ -1,5 +1,5 @@
 import type { Component } from 'vue';
-import type { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import { Roll } from '@dice-roller/rpg-dice-roller';
 import type {
   UseDiceRollerOptions,
   UseDiceRollerReturn,
@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { JSDOM } from 'jsdom';
 
-const dom = new JSDOM('<!doctype html><html><body></body></html>', {
+const dom = new JSDOM('<!doctype html><html lang="en"><body></body></html>', {
   url: 'http://localhost',
 });
 for (const key of [
@@ -76,7 +76,7 @@ function mount(
     ...initialProps,
   });
   const events = {
-    rolls: [] as [string, DiceRoll | null][],
+    rolls: [] as [string, Roll | null][],
     changes: [] as string[],
     updates: [] as string[],
     warnings: [] as string[],
@@ -92,7 +92,7 @@ function mount(
     render: () =>
       h(component, {
         ...props,
-        onRoll: (...args: [string, DiceRoll | null]) => events.rolls.push(args),
+        onRoll: (...args: [string, Roll | null]) => events.rolls.push(args),
         'onNotation:change': (value: string) => events.changes.push(value),
         'onUpdate:notation': (value: string) => events.updates.push(value),
       }),
@@ -402,11 +402,11 @@ test('composable accepts refs/getters and local v-model edits without source fee
 });
 
 test('composable keeps rolls, validation and clipboard state independent per call', async () => {
-  const rolls: [string, DiceRoll | null][] = [];
+  const rolls: [string, Roll | null][] = [];
   const f = mountRollers(
     {
       notation: '2d1',
-      onRoll: (...args: [string, DiceRoll | null]) => rolls.push(args),
+      onRoll: (...args: [string, Roll | null]) => rolls.push(args),
     },
     {},
   );
@@ -420,6 +420,8 @@ test('composable keeps rolls, validation and clipboard state independent per cal
     assert.equal(first.copy.isSupported, true);
     first.roll();
     assert.equal(first.output.value!.total, 2);
+    assert.ok(first.output.value instanceof Roll);
+    assert.equal(first.output.value.reroll().total, 2);
     assert.equal(rolls[0][0], '2d1');
     assert.equal(rolls[0][1], first.output.value);
     assert.equal(second.output.value, null);
@@ -457,7 +459,7 @@ test('renderless adapter preserves its slot contract and ordered events', async 
   const host = document.createElement('div');
   document.body.append(host);
   const events: (
-    ['update' | 'change', string] | ['roll', string, DiceRoll | null]
+    ['update' | 'change', string] | ['roll', string, Roll | null]
   )[] = [];
   let state!: DiceRollerSlotProps;
   const app = createApp({
@@ -470,7 +472,7 @@ test('renderless adapter preserves its slot contract and ordered events', async 
             events.push(['update', value]),
           'onNotation:change': (value: string) =>
             events.push(['change', value]),
-          onRoll: (...args: [string, DiceRoll | null]) =>
+          onRoll: (...args: [string, Roll | null]) =>
             events.push(['roll', ...args]),
         },
         {
@@ -513,7 +515,7 @@ test('renderless adapter preserves its slot contract and ordered events', async 
     await settle();
     assert.equal(events[2][0], 'roll');
     assert.equal(events[2][1], '2d1');
-    assert.equal((events[2] as ['roll', string, DiceRoll])[2].total, 2);
+    assert.equal((events[2] as ['roll', string, Roll])[2].total, 2);
     assert.equal(state.output!.total, 2);
   } finally {
     app.unmount();

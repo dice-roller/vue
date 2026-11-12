@@ -1,8 +1,9 @@
-import type { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import type { Roll } from '@dice-roller/rpg-dice-roller';
 import type {
   ComputedRef,
   InputHTMLAttributes,
   MaybeRefOrGetter,
+  ShallowRef,
   VNodeChild,
   WritableComputedRef,
   Ref,
@@ -26,7 +27,7 @@ export interface UseDiceRollerOptions {
   notation?: MaybeRefOrGetter<string | null | undefined>;
   labels?: MaybeRefOrGetter<Partial<DiceRollerLabels> | undefined>;
   onNotationChange?: (notation: string) => void;
-  onRoll?: (notation: string, result: DiceRoll | null) => void;
+  onRoll?: (notation: string, result: Roll | null) => void;
 }
 export interface DiceRollerClipboard {
   copy: () => Promise<void>;
@@ -43,7 +44,7 @@ export interface DiceRollerInputHandlers {
 export interface UseDiceRollerReturn {
   currentNotation: WritableComputedRef<string>;
   error: Ref<string | null>;
-  output: Ref<DiceRoll | null>;
+  output: ShallowRef<Roll | null>;
   roll: () => void;
   labels: ComputedRef<DiceRollerLabels>;
   setNotation: (notation: string) => void;
@@ -54,13 +55,13 @@ export interface UseDiceRollerReturn {
 export type DiceRollerEmits = {
   'notation:change': [notation: string];
   'update:notation': [notation: string];
-  roll: [notation: string, result: DiceRoll | null];
+  roll: [notation: string, result: Roll | null];
 };
 export type DiceRollerSlots = { button?: () => VNodeChild };
 export interface DiceRollerSlotProps {
   currentNotation: string;
   error: string | null;
-  output: DiceRoll | null;
+  output: Roll | null;
   roll: () => void;
   labels: DiceRollerLabels;
   bind: { value: string };

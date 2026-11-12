@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import type { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import type { Roll } from '@dice-roller/rpg-dice-roller';
 import {
   DiceRoller,
   DiceRollerBootstrap,
@@ -21,11 +21,11 @@ const roller: UseDiceRollerReturn = useDiceRoller({
   },
   onRoll: (expression, result) => {
     expression satisfies string;
-    result satisfies DiceRoll | null;
+    result satisfies Roll | null;
   },
 });
 roller.currentNotation.value = '2d6';
-roller.output.value satisfies DiceRoll | null;
+roller.output.value satisfies Roll | null;
 roller.copy.copied satisfies boolean;
 roller.copy.copy() satisfies Promise<void>;
 roller.on.input(new Event('input'));
@@ -50,7 +50,7 @@ export const badProps: InstanceType<typeof DiceRoller>['$props'] = {
   notation: 42,
 };
 export const badEvent: InstanceType<typeof DiceRoller>['$props'] = {
-  // @ts-expect-error Roll handlers receive DiceRoll or null, not a number.
+  // @ts-expect-error Roll handlers receive Roll or null, not a number.
   onRoll: (_: string, result: number) => result,
 };
 export type RenderlessSlot = Parameters<
