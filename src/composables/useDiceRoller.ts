@@ -1,6 +1,6 @@
-import { computed, reactive, ref, toValue, watch } from 'vue';
+import { computed, reactive, ref, shallowRef, toValue, watch } from 'vue';
 import type { UseDiceRollerOptions, UseDiceRollerReturn } from '../types.js';
-import { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import { errors, Roll } from '@dice-roller/rpg-dice-roller';
 import { useSupported, useTimeoutFn } from '@vueuse/core';
 
 /**
@@ -23,7 +23,7 @@ export function useDiceRoller(
   }));
   const notationValue = ref(toValue(options.notation) ?? '');
   const error = ref<string | null>(null);
-  const output = ref<DiceRoll | null>(null);
+  const output = shallowRef<Roll | null>(null);
   const clipboardError = ref<string | null>(null);
 
   watch(
@@ -37,14 +37,12 @@ export function useDiceRoller(
     error.value = null;
     clipboardError.value = null;
     try {
-      output.value = notationValue.value
-        ? new DiceRoll(notationValue.value)
-        : null;
+      output.value = notationValue.value ? new Roll(notationValue.value) : null;
     } catch (cause) {
       const e = cause as Error;
       output.value = null;
       error.value = `${
-        e.name === 'SyntaxError'
+        cause instanceof errors.NotationError
           ? labels.value.invalidNotation
           : labels.value.error
       }: ${e.message}`;

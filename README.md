@@ -16,7 +16,7 @@ Requires Vue 3.5.45 or newer within Vue 3.
 npm install @dice-roller/vue
 ```
 
-Vue and `@dice-roller/rpg-dice-roller` are required peer dependencies. npm installs required peers automatically; with other package managers, ensure compatible versions are installed in your application.
+Vue and v6 of `@dice-roller/rpg-dice-roller` are required peer dependencies. npm installs required peers automatically; with other package managers, ensure compatible versions are installed in your application.
 
 ## Quick start
 
@@ -217,11 +217,11 @@ The component manages the input's `id`, `value`, `type`, `name` and validation a
 
 All four components emit these events:
 
-| Event             | Arguments                                      | Description                                                             |
-| ----------------- | ---------------------------------------------- | ----------------------------------------------------------------------- |
-| `update:notation` | `notation: string`                             | Local notation changed; used by `v-model:notation`.                     |
-| `notation:change` | `notation: string`                             | Local notation changed through user input.                              |
-| `roll`            | `notation: string`, `result: DiceRoll \| null` | A roll was attempted. The result is `null` for an empty or failed roll. |
+| Event             | Arguments                                  | Description                                                             |
+| ----------------- | ------------------------------------------ | ----------------------------------------------------------------------- |
+| `update:notation` | `notation: string`                         | Local notation changed; used by `v-model:notation`.                     |
+| `notation:change` | `notation: string`                         | Local notation changed through user input.                              |
+| `roll`            | `notation: string`, `result: Roll \| null` | A roll was attempted. The result is `null` for an empty or failed roll. |
 
 Parent-driven notation changes do not emit notation-change events. Results are dice roll objects; use `result.total` for the total or `String(result)` for the formatted result.
 
@@ -322,17 +322,17 @@ For component props, pass getters such as `notation: () => props.notation` and `
 
 Destructure the return object in setup. Refs use `.value` in JavaScript and unwrap as top-level bindings in templates.
 
-| Value                   | Type                  | Description                                                                   |
-| ----------------------- | --------------------- | ----------------------------------------------------------------------------- |
-| `currentNotation`       | Writable computed ref | Editable notation. Assigning a different value calls `onNotationChange`.      |
-| `setNotation(notation)` | Function              | Updates the local notation.                                                   |
-| `output`                | Ref                   | Latest `DiceRoll`, or `null` before a roll and after an empty or failed roll. |
-| `error`                 | Ref                   | Roll error message or `null`; cleared at the next roll attempt.               |
-| `roll()`                | Function              | Rolls the current notation and updates the result/error state.                |
-| `labels`                | Computed ref          | Resolved interface and error labels.                                          |
-| `bind`                  | Computed ref          | `{ value: string }` input binding.                                            |
-| `on`                    | Object                | `input`, `change` and `keydown` handlers for `v-on`.                          |
-| `copy`                  | Reactive object       | Clipboard methods and state, described below.                                 |
+| Value                   | Type                  | Description                                                                  |
+| ----------------------- | --------------------- | ---------------------------------------------------------------------------- |
+| `currentNotation`       | Writable computed ref | Editable notation. Assigning a different value calls `onNotationChange`.     |
+| `setNotation(notation)` | Function              | Updates the local notation.                                                  |
+| `output`                | Shallow ref           | Latest v6 `Roll`, or `null` before a roll and after an empty or failed roll. |
+| `error`                 | Ref                   | Roll error message or `null`; cleared at the next roll attempt.              |
+| `roll()`                | Function              | Rolls the current notation and updates the result/error state.               |
+| `labels`                | Computed ref          | Resolved interface and error labels.                                         |
+| `bind`                  | Computed ref          | `{ value: string }` input binding.                                           |
+| `on`                    | Object                | `input`, `change` and `keydown` handlers for `v-on`.                         |
+| `copy`                  | Reactive object       | Clipboard methods and state, described below.                                |
 
 Use `v-bind="bind"` and `v-on="on"` together. Alternatively, use `v-model="currentNotation"` with `@keydown="on.keydown"`. Enter rolls without submitting a surrounding form; held-key repeats and Enter during IME composition are ignored.
 
@@ -391,7 +391,7 @@ Use unique input and error IDs when rendering multiple instances.
 | `bind`            | `{ value: string }` binding for the notation input.                          |
 | `on`              | `input`, `change` and `keydown` event handlers.                              |
 | `roll`            | Function that rolls the current notation.                                    |
-| `output`          | Latest `DiceRoll` object or `null`.                                          |
+| `output`          | Latest v6 `Roll` object or `null`.                                           |
 | `error`           | Roll error message or `null`.                                                |
 | `labels`          | Resolved interface and error labels.                                         |
 | `copy`            | Clipboard object with `copy()`, `isSupported`, `copied`, `text` and `error`. |

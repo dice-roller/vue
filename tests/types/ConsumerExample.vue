@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import type { Roll } from '@dice-roller/rpg-dice-roller';
 import {
   DiceRoller,
   DiceRollerBootstrap,
@@ -8,7 +8,7 @@ import {
   DiceRollerRenderless,
 } from '@dice-roller/vue';
 const notation = ref('4d6');
-const onRoll = (_expression: string, result: DiceRoll | null) => result;
+const onRoll = (_expression: string, result: Roll | null) => result;
 </script>
 
 <template>
