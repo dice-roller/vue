@@ -1,46 +1,35 @@
-<script setup>
-import { ref, unref } from 'vue';
-import { DiceRoll } from '@dice-roller/rpg-dice-roller';
-import { useClipboard } from '@vueuse/core';
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import type {
+  DiceRollerEmits,
+  DiceRollerLabels,
+  DiceRollerSlotProps,
+} from '../types.js';
+import { useDiceRoller } from '../composables/useDiceRoller.js';
 
-const emit = defineEmits(['notation:change', 'roll']);
+defineSlots<{
+  default?: (props: DiceRollerSlotProps) => import('vue').VNodeChild;
+}>();
 
+const emit = defineEmits<DiceRollerEmits>();
 const props = defineProps({
   notation: String,
+  labels: {
+    type: Object as PropType<Partial<DiceRollerLabels>>,
+    default: () => ({}),
+  },
 });
 
-const currentNotation = ref(`${props.notation || ''}`);
-const error = ref(null);
-const output = ref(null);
-
-const roll = async () => {
-  error.value = null;
-
-  try {
-    output.value = currentNotation.value
-      ? new DiceRoll(unref(currentNotation))
-      : null;
-  } catch (e) {
-    output.value = null;
-
-    if (e.name === 'SyntaxError') {
-      error.value = `Invalid notation; ${e.message}`;
-    } else {
-      error.value = `An error has occurred: ${e.message}`;
-    }
-  } finally {
-    emit('roll', unref(currentNotation), unref(output));
-  }
-};
-
-const setNotation = (notation) => {
-  currentNotation.value = notation;
-
-  emit('notation:change', notation);
-};
-
-const { text, copy, copied, isSupported } = useClipboard({ output });
-const copyOutput = () => copy(`${unref(output)}`);
+const { currentNotation, error, output, roll, labels, bind, on, copy } =
+  useDiceRoller({
+    notation: () => props.notation,
+    labels: () => props.labels,
+    onNotationChange: (notation) => {
+      emit('update:notation', notation);
+      emit('notation:change', notation);
+    },
+    onRoll: (notation, result) => emit('roll', notation, result),
+  });
 </script>
 
 <template>
@@ -49,17 +38,9 @@ const copyOutput = () => copy(`${unref(output)}`);
     :error="error"
     :output="output"
     :roll="roll"
-    :bind="{ value: currentNotation }"
-    :on="{
-      input: (event) => setNotation(event.target.value),
-      change: (event) => setNotation(event.target.value),
-      keyup: (event) => (event.keyCode === 13 ? roll() : undefined),
-    }"
-    :copy="{
-      copy: copyOutput,
-      copied,
-      text,
-      isSupported,
-    }"
+    :labels="labels"
+    :bind="bind"
+    :on="on"
+    :copy="copy"
   />
 </template>

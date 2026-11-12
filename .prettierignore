@@ -1,0 +1,8 @@
+dist/
+dist-ssr/
+coverage/
+package-lock.json
+
+playground-dist/
+test-results/
+playwright-report/

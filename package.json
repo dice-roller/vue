@@ -3,6 +3,7 @@
   "version": "1.3.3",
   "description": "Vue.js component which allows rolling dice",
   "type": "module",
+  "sideEffects": false,
   "files": [
     "dist"
   ],
@@ -11,16 +12,31 @@
   "unpkg": "./dist/vue.umd.cjs",
   "exports": {
     ".": {
-      "import": "./dist/vue.js",
-      "require": "./dist/vue.umd.cjs"
+      "import": {
+        "types": "./dist/types/index.d.mts",
+        "default": "./dist/vue.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/vue.umd.cjs"
+      }
     }
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview --port 4173",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
-    "prepublishOnly": "npm run build"
+    "dev": "vite --config vite.playground.config.ts",
+    "build": "vite build && npm run build:types",
+    "preview": "vite preview --config vite.playground.config.ts --port 4173",
+    "lint": "eslint . --max-warnings=0",
+    "prepublishOnly": "npm run build",
+    "test": "npm run build && npm run typecheck && npm run test:types && node --test tests/*.test.ts",
+    "lint:fix": "eslint . --fix --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "build:playground": "vite build --config vite.playground.config.ts",
+    "test:playground": "npm run build:playground && playwright test",
+    "build:types": "vue-tsc -p tsconfig.build.json",
+    "typecheck": "vue-tsc --noEmit",
+    "test:types": "vue-tsc --noEmit -p tests/types/tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -31,28 +47,53 @@
     "roll",
     "vue"
   ],
-  "author": "GreenImp Media <info@greenimp.co.uk> (http://greenimp.co.uk)",
+  "author": "GreenImp Media <info@greenimp.co.uk> (https://greenimp.co.uk)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dice-roller/vue/issues"
   },
   "homepage": "https://github.com/dice-roller/vue",
   "dependencies": {
-    "@dice-roller/rpg-dice-roller": "^5.5.0",
     "@heroicons/vue": "^2.2.0",
-    "@vueuse/core": "^14.2.0",
-    "vue": "^3.2.39"
+    "@vueuse/core": "^15.0.0"
   },
   "devDependencies": {
-    "@rushstack/eslint-patch": "^1.1.4",
-    "@vitejs/plugin-vue": "^6.0.4",
-    "@vue/eslint-config-prettier": "^7.0.0",
-    "autoprefixer": "^10.4.8",
-    "eslint": "^8.22.0",
-    "eslint-plugin-vue": "^9.3.0",
-    "postcss": "^8.4.16",
-    "prettier": "^2.7.1",
-    "tailwindcss": "^3.1.8",
-    "vite": "^7.3.1"
-  }
+    "@dice-roller/rpg-dice-roller": "^5.5.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.0",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.6",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "autoprefixer": "^10.6.2",
+    "bootstrap": "^5.3.9",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.12.1",
+    "globals": "^17.14.0",
+    "jiti": "^2.7.0",
+    "jsdom": "^31.0.0",
+    "postcss": "^8.5.32",
+    "postcss-prefix-selector": "^2.2.1",
+    "prettier": "^3.10.0",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vite": "^8.3.8",
+    "vue": "^3.5.45",
+    "vue-eslint-parser": "^10.4.2",
+    "vue-tsc": "^3.3.14"
+  },
+  "peerDependencies": {
+    "@dice-roller/rpg-dice-roller": "^5.5.0",
+    "vue": "^3.5.45"
+  },
+  "overrides": {
+    "eslint": {
+      "minimatch": "^11.0.5"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.5"
+    }
+  },
+  "types": "./dist/types/index.d.mts"
 }
