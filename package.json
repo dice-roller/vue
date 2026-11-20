@@ -1,6 +1,6 @@
 {
   "name": "@dice-roller/vue",
-  "version": "2.0.0-beta.0",
+  "version": "2.0.0-beta.1",
   "description": "Vue.js component which allows rolling dice",
   "type": "module",
   "sideEffects": false,
