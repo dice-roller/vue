@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import DiceRollerRenderless from '../src/components/DiceRollerRenderless.vue';
+import type { RollInputData } from '@dice-roller/rpg-dice-roller';
+
+defineProps<{ data?: RollInputData }>();
 </script>
 
 <template>
   <DiceRollerRenderless
     notation="4d6"
+    :data="data"
     v-slot="{ error, output, roll, on, bind, copy }"
   >
     <div

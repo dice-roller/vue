@@ -6,6 +6,7 @@ import type {
   DiceRollerSlotProps,
 } from '../types.js';
 import { useDiceRoller } from '../composables/useDiceRoller.js';
+import type { RollInputData } from '@dice-roller/rpg-dice-roller';
 
 defineSlots<{
   default?: (props: DiceRollerSlotProps) => import('vue').VNodeChild;
@@ -18,12 +19,18 @@ const props = defineProps({
     type: Object as PropType<Partial<DiceRollerLabels>>,
     default: () => ({}),
   },
+  data: {
+    type: Object as PropType<RollInputData>,
+    required: false,
+    default: () => ({}),
+  },
 });
 
-const { currentNotation, error, output, roll, labels, bind, on, copy } =
+const { currentNotation, data, error, output, roll, labels, bind, on, copy } =
   useDiceRoller({
     notation: () => props.notation,
     labels: () => props.labels,
+    data: () => props.data,
     onNotationChange: (notation) => {
       emit('update:notation', notation);
       emit('notation:change', notation);
@@ -42,5 +49,6 @@ const { currentNotation, error, output, roll, labels, bind, on, copy } =
     :bind="bind"
     :on="on"
     :copy="copy"
+    :data="data"
   />
 </template>

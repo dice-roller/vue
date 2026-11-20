@@ -5,7 +5,7 @@ import { useSupported, useTimeoutFn } from '@vueuse/core';
 
 /**
  * Create an independent dice roller inside setup() or <script setup lang="ts">.
- * notation and labels accept plain values, refs or getters.
+ * notation, data and labels accept plain values, refs or getters.
  * Source updates are silent; local edits call onNotationChange once.
  * onRoll receives (notation, result), including null for empty/failed rolls.
  */
@@ -25,6 +25,7 @@ export function useDiceRoller(
   const error = ref<string | null>(null);
   const output = shallowRef<Roll | null>(null);
   const clipboardError = ref<string | null>(null);
+  const data = computed(() => toValue(options.data));
 
   watch(
     () => toValue(options.notation),
@@ -37,7 +38,9 @@ export function useDiceRoller(
     error.value = null;
     clipboardError.value = null;
     try {
-      output.value = notationValue.value ? new Roll(notationValue.value) : null;
+      output.value = notationValue.value
+        ? new Roll(notationValue.value, { data: data.value })
+        : null;
     } catch (cause) {
       const e = cause as Error;
       output.value = null;
@@ -131,5 +134,6 @@ export function useDiceRoller(
     bind,
     on,
     copy,
+    data,
   };
 }

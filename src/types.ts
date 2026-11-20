@@ -1,4 +1,4 @@
-import type { Roll } from '@dice-roller/rpg-dice-roller';
+import type { Roll, RollInputData } from '@dice-roller/rpg-dice-roller';
 import type {
   ComputedRef,
   InputHTMLAttributes,
@@ -25,6 +25,7 @@ export type DiceRollerInputAttrs = Omit<
   Record<string, unknown>;
 export interface UseDiceRollerOptions {
   notation?: MaybeRefOrGetter<string | null | undefined>;
+  data?: MaybeRefOrGetter<RollInputData | undefined>;
   labels?: MaybeRefOrGetter<Partial<DiceRollerLabels> | undefined>;
   onNotationChange?: (notation: string) => void;
   onRoll?: (notation: string, result: Roll | null) => void;
@@ -51,6 +52,7 @@ export interface UseDiceRollerReturn {
   bind: ComputedRef<{ value: string }>;
   on: DiceRollerInputHandlers;
   copy: DiceRollerClipboard;
+  data: ComputedRef<RollInputData | undefined>;
 }
 export type DiceRollerEmits = {
   'notation:change': [notation: string];
@@ -67,6 +69,7 @@ export interface DiceRollerSlotProps {
   bind: { value: string };
   on: DiceRollerInputHandlers;
   copy: DiceRollerClipboard;
+  data: RollInputData | undefined;
 }
 
 export type BootstrapVariant =

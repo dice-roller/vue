@@ -458,6 +458,7 @@ test('composable keeps rolls, validation and clipboard state independent per cal
 test('renderless adapter preserves its slot contract and ordered events', async () => {
   const host = document.createElement('div');
   document.body.append(host);
+  const data = ref({ character: { bonus: 3 } });
   const events: (
     ['update' | 'change', string] | ['roll', string, Roll | null]
   )[] = [];
@@ -468,6 +469,7 @@ test('renderless adapter preserves its slot contract and ordered events', async 
         library.DiceRollerRenderless,
         {
           notation: '1d1',
+          data: data.value,
           'onUpdate:notation': (value: string) =>
             events.push(['update', value]),
           'onNotation:change': (value: string) =>
@@ -489,6 +491,7 @@ test('renderless adapter preserves its slot contract and ordered events', async 
       'bind',
       'copy',
       'currentNotation',
+      'data',
       'error',
       'labels',
       'on',
@@ -503,20 +506,23 @@ test('renderless adapter preserves its slot contract and ordered events', async 
       'text',
     ]);
     assert.equal(state.currentNotation, '1d1');
-    state.on.input(inputEvent('2d1'));
-    state.on.change(inputEvent('2d1'));
+    assert.deepEqual(state.data, { character: { bonus: 3 } });
+    state.on.input(inputEvent('2d1+$character.bonus'));
+    state.on.change(inputEvent('2d1+$character.bonus'));
+    data.value = { character: { bonus: 5 } };
     await settle();
-    assert.equal(state.bind.value, '2d1');
+    assert.equal(state.bind.value, '2d1+$character.bonus');
+    assert.deepEqual(state.data, { character: { bonus: 5 } });
     assert.deepEqual(events, [
-      ['update', '2d1'],
-      ['change', '2d1'],
+      ['update', '2d1+$character.bonus'],
+      ['change', '2d1+$character.bonus'],
     ]);
     state.roll();
     await settle();
     assert.equal(events[2][0], 'roll');
-    assert.equal(events[2][1], '2d1');
-    assert.equal((events[2] as ['roll', string, Roll])[2].total, 2);
-    assert.equal(state.output!.total, 2);
+    assert.equal(events[2][1], '2d1+$character.bonus');
+    assert.equal((events[2] as ['roll', string, Roll])[2].total, 7);
+    assert.equal(state.output!.total, 7);
   } finally {
     app.unmount();
     host.remove();

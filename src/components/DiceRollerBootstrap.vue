@@ -51,6 +51,7 @@ import { ClipboardIcon } from '@heroicons/vue/24/outline';
 import { visuallyHiddenStyle } from '../accessibility.js';
 import { useDiceRoller } from '../composables/useDiceRoller.js';
 import { useIdGenerator } from '../composables/idGenerator.js';
+import type { RollInputData } from '@dice-roller/rpg-dice-roller';
 
 defineOptions({ inheritAttrs: false });
 
@@ -125,6 +126,11 @@ const props = defineProps({
       return variants.includes(value);
     },
   },
+  data: {
+    type: Object as PropType<RollInputData>,
+    required: false,
+    default: () => ({}),
+  },
 });
 
 const cardClass = computed(() => {
@@ -161,6 +167,7 @@ const {
 } = useDiceRoller({
   notation: () => props.notation,
   labels: () => props.labels,
+  data: () => props.data,
   onNotationChange: (notation) => {
     emit('update:notation', notation);
     emit('notation:change', notation);
